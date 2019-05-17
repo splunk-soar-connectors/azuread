@@ -835,13 +835,13 @@ class AzureADGraphConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        action_result.add_data(response)
-
         summary = action_result.update_summary({})
         if user_id:
+            action_result.add_data({ 'value': [response] })
             summary['status'] = "Successfully retrieved attributes for user {}".format(user_id)
             summary['user_enabled'] = response.get('accountEnabled')
         else:
+            action_result.add_data(response)
             summary['status'] = "Successfully retrieved user attributes"
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -1171,14 +1171,8 @@ class AzureADGraphConnector(BaseConnector):
         elif action_id == 'list_user_attributes':
             ret_val = self._handle_list_user_attributes(param)
 
-        elif action_id == 'list_system_attributes':
-            ret_val = self._handle_list_system_attributes(param)
-
         elif action_id == 'set_user_attribute':
             ret_val = self._handle_set_user_attribute(param)
-
-        elif action_id == 'set_system_attribute':
-            ret_val = self._handle_set_system_attribute(param)
 
         elif action_id == 'list_user_groups':
             ret_val = self._handle_list_user_groups(param)
@@ -1200,6 +1194,9 @@ class AzureADGraphConnector(BaseConnector):
 
         elif action_id == 'validate_group':
             ret_val = self._handle_validate_group(param)
+
+        elif action_id == 'list_domains':
+            ret_val = self._handle_list_domains(param)
 
         return ret_val
 

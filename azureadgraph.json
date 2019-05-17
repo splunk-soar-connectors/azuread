@@ -750,7 +750,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully enabled user pratikp@testphantom.onmicrosoft.com"
-                    ]
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -829,7 +831,9 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully disabled user pratikp@testphantom.onmicrosoft.com"
-                    ]
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -880,353 +884,388 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.mailNickname",
-                    "data_type": "string",
-                    "example_values": [
-                        "pratikp"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.surname",
-                    "data_type": "string",
-                    "example_values": [
-                        "Parmar"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.userState",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.passwordProfile.enforceChangePasswordPolicy",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.passwordProfile.password",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.passwordProfile.forceChangePasswordNextLogin",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.assignedLicenses.*.skuId",
-                    "data_type": "string",
-                    "example_values": [
-                        "f30db892-07e9-47e9-837c-80727f46fd3d"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.lastDirSyncTime",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.userPrincipalName",
-                    "data_type": "string",
-                    "example_values": [
-                        "pratikp@testphantom.onmicrosoft.com"
-                    ],
-                    "contains": [
-                        "email"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.sipProxyAddress",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.consentProvidedForMinor",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.userType",
-                    "data_type": "string",
-                    "example_values": [
-                        "Member"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.odata.type",
-                    "data_type": "string",
-                    "example_values": [
-                        "Microsoft.DirectoryServices.User"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.usageLocation",
-                    "data_type": "string",
-                    "example_values": [
-                        "US"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.objectType",
-                    "data_type": "string",
-                    "example_values": [
-                        "User"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.city",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.employeeId",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.objectId",
-                    "data_type": "string",
-                    "example_values": [
-                        "d8f4d0a2-68fa-48b6-b98b-c8dada10173a"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.preferredLanguage",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.companyName",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.state",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.userStateChangedOn",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.streetAddress",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.givenName",
-                    "data_type": "string",
-                    "example_values": [
-                        "Pratik"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.postalCode",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.mail",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.accountEnabled",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.refreshTokensValidFromDateTime",
-                    "data_type": "string",
-                    "example_values": [
-                        "2018-11-29T12:16:23Z"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.creationType",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.jobTitle",
-                    "data_type": "string"
-                },
-                {
                     "data_path": "action_result.data.*.odata.metadata",
                     "data_type": "string",
                     "example_values": [
-                        "https://graph.windows.net/1e309abf-db6c-4fcb-a1d2-07bf6824d58d/$metadata#directoryObjects/@Element"
+                        "https://graph.windows.net/1e309abf-db6c-4fcb-a1d2-07bf6824d58d/$metadata#directoryObjects"
                     ],
                     "contains": [
                         "url"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.isCompromised",
+                    "data_path": "action_result.data.*.value.*.mailNickname",
+                    "data_type": "string",
+                    "example_values": [
+                        "luke"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.surname",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.userState",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.passwordProfile.enforceChangePasswordPolicy",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.passwordProfile.password",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.passwordProfile.forceChangePasswordNextLogin",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.lastDirSyncTime",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.userPrincipalName",
+                    "data_type": "string",
+                    "example_values": [
+                        "luke@testphantom.onmicrosoft.com"
+                    ],
+                    "contains": [
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.sipProxyAddress",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.consentProvidedForMinor",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.userType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Member"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.odata.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.DirectoryServices.User"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.usageLocation",
+                    "data_type": "string",
+                    "example_values": [
+                        "US"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.objectType",
+                    "data_type": "string",
+                    "example_values": [
+                        "User"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.city",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.employeeId",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.objectId",
+                    "data_type": "string",
+                    "example_values": [
+                        "59f51194-1998-4932-a8ac-468e59374edc"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.preferredLanguage",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.companyName",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.state",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.userStateChangedOn",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.streetAddress",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.givenName",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.postalCode",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.mail",
+                    "data_type": "string",
+                    "contains": [
+                        "email"
+                    ],
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.accountEnabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.refreshTokensValidFromDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-16T19:54:18Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.creationType",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.jobTitle",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.isCompromised",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.immutableId",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.department",
+                    "data_type": "string",
+                    "example_values": [
+                        "Sales"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Luke Skywalker"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.legalAgeGroupClassification",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.telephoneNumber",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.passwordPolicies",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.onPremisesDistinguishedName",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.physicalDeliveryOfficeName",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.deletionTimestamp",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.mobile",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.country",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.thumbnailPhoto@odata.mediaEditLink",
+                    "data_type": "string",
+                    "example_values": [
+                        "directoryObjects/59f51194-1998-4932-a8ac-468e59374edc/Microsoft.DirectoryServices.User/thumbnailPhoto"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.createdDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-02T20:27:59Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.dirSyncEnabled",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.facsimileTelephoneNumber",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.onPremisesSecurityIdentifier",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.showInAddressList",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.ageGroup",
+                    "data_type": "string",
+                    "example_values": []
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.passwordProfile",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.assignedPlans.*.capabilityStatus",
+                    "data_path": "action_result.data.*.value.*.assignedLicenses.*.skuId",
+                    "data_type": "string",
+                    "example_values": [
+                        "f30db892-07e9-47e9-837c-80727f46fd3d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.assignedPlans.*.capabilityStatus",
                     "data_type": "string",
                     "example_values": [
                         "Enabled"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.assignedPlans.*.assignedTimestamp",
+                    "data_path": "action_result.data.*.value.*.assignedPlans.*.assignedTimestamp",
                     "data_type": "string",
                     "example_values": [
-                        "2018-11-29T12:16:23Z"
+                        "2019-04-26T07:21:18Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.assignedPlans.*.service",
+                    "data_path": "action_result.data.*.value.*.assignedPlans.*.service",
                     "data_type": "string",
                     "example_values": [
-                        "ProcessSimple"
+                        "exchange"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.assignedPlans.*.servicePlanId",
+                    "data_path": "action_result.data.*.value.*.assignedPlans.*.servicePlanId",
                     "data_type": "string",
                     "example_values": [
-                        "50e68c76-46c6-4674-81f9-75456511b170"
+                        "33c4f319-9bdd-48d6-9c4d-410b750a4a5a"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.immutableId",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.department",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.displayName",
+                    "data_path": "action_result.data.*.value.*.otherMails",
                     "data_type": "string",
                     "example_values": [
-                        "Pratik Parmar"
+                        "matt@testphantom.com"
+                    ],
+                    "contains": [
+                        "email"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.legalAgeGroupClassification",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.telephoneNumber",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.passwordPolicies",
+                    "data_path": "action_result.data.*.value.*.proxyAddresses",
                     "data_type": "string",
                     "example_values": [
-                        "None"
+                        "SMTP:test_shared_mailbox@testphantom.onmicrosoft.com"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.onPremisesDistinguishedName",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.physicalDeliveryOfficeName",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.provisionedPlans.*.capabilityStatus",
+                    "data_path": "action_result.data.*.value.*.provisionedPlans.*.capabilityStatus",
                     "data_type": "string",
                     "example_values": [
                         "Enabled"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.provisionedPlans.*.provisioningStatus",
+                    "data_path": "action_result.data.*.value.*.provisionedPlans.*.provisioningStatus",
                     "data_type": "string",
                     "example_values": [
                         "Success"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.provisionedPlans.*.service",
+                    "data_path": "action_result.data.*.value.*.provisionedPlans.*.service",
                     "data_type": "string",
                     "example_values": [
-                        "CRM"
+                        "exchange"
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.deletionTimestamp",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.mobile",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.country",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.thumbnailPhoto@odata.mediaEditLink",
-                    "data_type": "string",
-                    "example_values": [
-                        "directoryObjects/d8f4d0a2-68fa-48b6-b98b-c8dada10173a/Microsoft.DirectoryServices.User/thumbnailPhoto"
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.createdDateTime",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.dirSyncEnabled",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.facsimileTelephoneNumber",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.onPremisesSecurityIdentifier",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.showInAddressList",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.ageGroup",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Status: Successfully retrieved attributes for user pratikp@testphantom.onmicrosoft.com, User enabled: True"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.user_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "pratikp@testphantom.onmicrosoft.com"
-                    ],
-                    "contains": [
-                        "azure user principal name",
-                        "azure object id",
-                        "email"
+                        "Status: Successfully retrieved user attributes",
+                        "Status: Successfully retrieved attributes for user luke@testphantom.onmicrosoft.com, User enabled: False"
                     ]
                 },
                 {
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully retrieved attributes for user pratikp@testphantom.onmicrosoft.com"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.user_enabled",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
+                        "Successfully retrieved user attributes",
+                        "Successfully retrieved attributes for user luke@testphantom.onmicrosoft.com"
                     ]
                 },
                 {
@@ -1242,23 +1281,41 @@
                     "example_values": [
                         1
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.odata.metadata",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://graph.windows.net/1e309abf-db6c-4fcb-a1d2-07bf6824d58d/$metadata#directoryObjects/@Element"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "luke@testphantom.onmicrosoft.com"
+                    ],
+                    "contains": [
+                        "azure user principal name",
+                        "azure object id",
+                        "email"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.user_enabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 }
             ],
             "render": {
-                "type": "table"
-            },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "list system attributes",
-            "identifier": "list_system_attributes",
-            "description": "List attributes of the system",
-            "type": "generic",
-            "read_only": true,
-            "parameters": {},
-            "output": [],
-            "render": {
-                "type": "table"
+                "type": "custom",
+                "view": "azureadgraph_view.display_list_user_attributes"
             },
             "versions": "EQ(*)"
         },
@@ -1291,17 +1348,15 @@
                     "description": "Attribute to set",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "order": 2,
-                    "contains": []
+                    "primary": false,
+                    "order": 2
                 },
                 "attribute_value": {
                     "description": "Value of attribute to set",
                     "data_type": "string",
                     "required": true,
-                    "primary": true,
-                    "order": 3,
-                    "contains": []
+                    "primary": false,
+                    "order": 3
                 }
             },
             "output": [
@@ -1373,19 +1428,6 @@
                     ]
                 }
             ],
-            "render": {
-                "type": "table"
-            },
-            "versions": "EQ(*)"
-        },
-        {
-            "action": "set system attribute",
-            "identifier": "set_system_attribute",
-            "description": "Set a system attribute",
-            "type": "generic",
-            "read_only": true,
-            "parameters": {},
-            "output": [],
             "render": {
                 "type": "table"
             },
@@ -1470,7 +1512,9 @@
                     "example_values": [
                         "Successfully removed user from group",
                         "User not in group"
-                    ]
+                    ],
+                    "column_order": 0,
+                    "column_name": "Status"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1571,7 +1615,9 @@
                     "example_values": [
                         "Successfully added user to group",
                         "User already in group"
-                    ]
+                    ],
+                    "column_order": 0,
+                    "column_name": "Status"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -1630,21 +1676,30 @@
                     "data_type": "string",
                     "example_values": [
                         "Phantom-test-site"
-                    ]
+                    ],
+                    "column_name": "Display Name",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.value.*.description",
                     "data_type": "string",
                     "example_values": [
                         "This is for testing purpose"
-                    ]
+                    ],
+                    "column_name": "Description",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.data.*.value.*.objectId",
                     "data_type": "string",
                     "example_values": [
                         "2a201c95-101b-42d9-a7af-9a2fdf8193f1"
-                    ]
+                    ],
+                    "contains": [
+                        "azure object id"
+                    ],
+                    "column_name": "Object ID",
+                    "column_order": 2
                 },
                 {
                     "data_path": "action_result.data.*.value.*.mailNickname",
@@ -1986,14 +2041,21 @@
                     "data_type": "string",
                     "example_values": [
                         "Matthew Tichenor"
-                    ]
+                    ],
+                    "column_name": "Display Name",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.data.*.objectId",
                     "data_type": "string",
                     "example_values": [
                         "17be76d0-35ed-4881-ab62-d2eb73c2ebe3"
-                    ]
+                    ],
+                    "contains": [
+                        "azure object id"
+                    ],
+                    "column_name": "Object ID",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.message",
@@ -2083,7 +2145,9 @@
                     "example_values": [
                         true,
                         false
-                    ]
+                    ],
+                    "column_name": "User in Group",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.message",
