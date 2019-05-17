@@ -11,17 +11,11 @@ background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo
 {% block widget_content %}
 <!-- Main Start Block -->
 
-<!-- 
-File: azureadgraph_list_user_attributes.html
+<!-- File: azureadgraph_list_user_attributes.html
+  Copyright (c) 2019 Splunk Inc.
 
-Copyright (c) Phantom Cyber Corporation, 2018
-
-This unpublished material is proprietary to Phantom Cyber.
-All rights reserved. The methods and
-techniques described herein are considered trade secrets
-and/or confidential. Reproduction or distribution, in whole
-or in part, is forbidden except by express written permission
-of Phantom Cyber Corporation.
+  SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+  without a valid written license from Splunk Inc. is PROHIBITED.
 -->
 
 <style>
@@ -112,11 +106,21 @@ of Phantom Cyber Corporation.
                         </tr>
                         <tr>
                             <th>User Principal Name</th>
-                            <td>{{ item.userPrincipalName }}</td>
+                            <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['email', 'azure user principal name'], 'value': '{{ item.userPrincipalName }}' }], 0, {{ container.id }}, null, false);">
+                                {{ item.userPrincipalName }}
+                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a></td>
                         </tr>
                         <tr>
                             <th>Job Title</th>
                             <td>{{ item.jobTitle }}</td>
+                        </tr>
+                        <tr>
+                            <th>Object ID</th>
+                            <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['azure object id'], 'value': '{{ item.objectId }}' }], 0, {{ container.id }}, null, false);">
+                                {{ item.objectId }}
+                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                            </a></td>
                         </tr>
                     </table>
                     <br>

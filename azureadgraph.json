@@ -9,7 +9,7 @@
     "product_name": "Azure AD Graph",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2018-2019 Splunk Inc.",
+    "license": "Copyright (c) 2019 Splunk Inc.",
     "app_version": "1.0.1",
     "utctime_updated": "2017-12-19T23:44:00.000000Z",
     "package_name": "phantom_azureadgraph",
@@ -44,9 +44,9 @@
     "actions": [
         {
             "action": "test connectivity",
-            "identifier": "test_connectivity",
             "description": "Use supplied credentials to generate a token with MS Graph",
             "type": "test",
+            "identifier": "test_connectivity",
             "read_only": true,
             "parameters": {},
             "output": [],
@@ -54,9 +54,9 @@
         },
         {
             "action": "list users",
-            "identifier": "list_users",
-            "description": "List users",
+            "description": "List users in a tenant",
             "type": "investigate",
+            "identifier": "list_users",
             "read_only": true,
             "parameters": {
                 "filter_string": {
@@ -112,7 +112,7 @@
                     "column_name": "User Principal Name",
                     "column_order": 2,
                     "example_values": [
-                        "Herman@phantomengineering.onmicrosoft.com"
+                        "Herman@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "email",
@@ -123,7 +123,7 @@
                     "data_path": "action_result.data.*.value.*.sipProxyAddress",
                     "data_type": "string",
                     "example_values": [
-                        "Herman@phantomengineering.onmicrosoft.com"
+                        "Herman@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "email"
@@ -215,7 +215,7 @@
                     "data_path": "action_result.data.*.value.*.mail",
                     "data_type": "string",
                     "example_values": [
-                        "Herman@phantomengineering.onmicrosoft.com"
+                        "Herman@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "email"
@@ -280,8 +280,8 @@
                     "data_path": "action_result.data.*.value.*.proxyAddresses",
                     "data_type": "string",
                     "example_values": [
-                        "SMTP:test2@phantomengineering.onmicrosoft.com",
-                        "SMTP:Herman@phantomengineering.onmicrosoft.com"
+                        "SMTP:test2@test.onmicrosoft.com",
+                        "SMTP:Herman@test.onmicrosoft.com"
                     ]
                 },
                 {
@@ -318,7 +318,7 @@
                     "data_path": "action_result.data.*.value.*.mobile",
                     "data_type": "string",
                     "example_values": [
-                        "+1 5106378617"
+                        "+1 5556378688"
                     ]
                 },
                 {
@@ -409,19 +409,19 @@
                     ]
                 }
             ],
-            "versions": "EQ(*)",
             "render": {
                 "width": 15,
                 "title": "User Listing",
                 "type": "table",
                 "height": 5
-            }
+            },
+            "versions": "EQ(*)"
         },
         {
             "action": "reset password",
-            "identifier": "reset_password",
             "description": "Reset or set a user's password in an Azure AD environment",
             "type": "contain",
+            "identifier": "reset_password",
             "read_only": false,
             "parameters": {
                 "user_id": {
@@ -493,7 +493,7 @@
                     "data_type": "string",
                     "example_values": [
                         "ee3dc4f2-70f9-446f-a19e-6b4e95ba030d",
-                        "luke@testphantom.onmicrosoft.com"
+                        "user@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "azure user principal name",
@@ -525,19 +525,19 @@
                     ]
                 }
             ],
-            "versions": "EQ(*)",
             "render": {
                 "width": 12,
                 "title": "User Password Reset",
                 "type": "table",
                 "height": 5
-            }
+            },
+            "versions": "EQ(*)"
         },
         {
             "action": "disable tokens",
-            "identifier": "invalidate_tokens",
             "description": "Invalidate all active refresh tokens for a user in an Azure AD environment",
             "type": "contain",
+            "identifier": "invalidate_tokens",
             "read_only": false,
             "parameters": {
                 "user_id": {
@@ -581,7 +581,7 @@
                     "data_type": "string",
                     "example_values": [
                         "ee3dc4f2-70f9-446f-a19e-6b4e95ba030d",
-                        "luke@testphantom.onmicrosoft.com"
+                        "user@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "azure user principal name",
@@ -617,7 +617,7 @@
                     "data_path": "action_result.data.*.odata.metadata",
                     "data_type": "string",
                     "example_values": [
-                        "https://graph.windows.net/1e309abf-db6c-4fcb-a1d2-07bf6824d58d/$metadata#Edm.Null"
+                        "https://graph.windows.net/2e799abf-db6c-4fcb-a1d2-07bf1824d58d/$metadata#Edm.Null"
                     ],
                     "contains": [
                         "url"
@@ -631,20 +631,20 @@
                     ]
                 }
             ],
-            "versions": "EQ(*)",
             "render": {
                 "width": 12,
                 "title": "Invalidate Tokens",
                 "type": "table",
                 "height": 5
-            }
+            },
+            "versions": "EQ(*)"
         },
         {
             "action": "generate token",
-            "identifier": "generate_token",
             "description": "Generates a token",
             "verbose": "This action generates a new token whenever any action fails because of invalid or expired token",
             "type": "generic",
+            "identifier": "generate_token",
             "read_only": false,
             "parameters": {},
             "output": [
@@ -695,10 +695,9 @@
         },
         {
             "action": "enable user",
-            "undo": "disable user",
-            "identifier": "enable_user",
             "description": "Enable a user",
             "type": "generic",
+            "identifier": "enable_user",
             "read_only": false,
             "parameters": {
                 "user_id": {
@@ -730,14 +729,14 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Status: Successfully enabled user pratikp@testphantom.onmicrosoft.com"
+                        "Status: Successfully enabled user user@test.onmicrosoft.com"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "example_values": [
-                        "pratikp@testphantom.onmicrosoft.com"
+                        "user@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "azure user principal name",
@@ -749,7 +748,7 @@
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully enabled user pratikp@testphantom.onmicrosoft.com"
+                        "Successfully enabled user user@test.onmicrosoft.com"
                     ],
                     "column_name": "Status",
                     "column_order": 0
@@ -776,10 +775,9 @@
         },
         {
             "action": "disable user",
-            "undo": "enable user",
-            "identifier": "disable_user",
             "description": "Disable a user",
             "type": "generic",
+            "identifier": "disable_user",
             "read_only": false,
             "parameters": {
                 "user_id": {
@@ -811,14 +809,14 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Status: Successfully disabled user pratikp@testphantom.onmicrosoft.com"
+                        "Status: Successfully disabled user user@test.onmicrosoft.com"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "example_values": [
-                        "pratikp@testphantom.onmicrosoft.com"
+                        "user@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "azure user principal name",
@@ -830,7 +828,7 @@
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully disabled user pratikp@testphantom.onmicrosoft.com"
+                        "Successfully disabled user user@test.onmicrosoft.com"
                     ],
                     "column_name": "Status",
                     "column_order": 0
@@ -857,9 +855,9 @@
         },
         {
             "action": "list user attributes",
-            "identifier": "list_user_attributes",
             "description": "List attributes for all or a specified user",
             "type": "generic",
+            "identifier": "list_user_attributes",
             "read_only": true,
             "parameters": {
                 "user_id": {
@@ -887,7 +885,7 @@
                     "data_path": "action_result.data.*.odata.metadata",
                     "data_type": "string",
                     "example_values": [
-                        "https://graph.windows.net/1e309abf-db6c-4fcb-a1d2-07bf6824d58d/$metadata#directoryObjects"
+                        "https://graph.windows.net/2e799abf-db6c-4fcb-a1d2-07bf1824d58d/$metadata#directoryObjects"
                     ],
                     "contains": [
                         "url"
@@ -897,7 +895,7 @@
                     "data_path": "action_result.data.*.value.*.mailNickname",
                     "data_type": "string",
                     "example_values": [
-                        "luke"
+                        "Herman"
                     ]
                 },
                 {
@@ -940,7 +938,7 @@
                     "data_path": "action_result.data.*.value.*.userPrincipalName",
                     "data_type": "string",
                     "example_values": [
-                        "luke@testphantom.onmicrosoft.com"
+                        "user@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "email"
@@ -1177,7 +1175,8 @@
                 },
                 {
                     "data_path": "action_result.data.*.value.*.passwordProfile",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": []
                 },
                 {
                     "data_path": "action_result.data.*.value.*.assignedLicenses.*.skuId",
@@ -1218,7 +1217,7 @@
                     "data_path": "action_result.data.*.value.*.otherMails",
                     "data_type": "string",
                     "example_values": [
-                        "matt@testphantom.com"
+                        "user@testphantom.com"
                     ],
                     "contains": [
                         "email"
@@ -1228,7 +1227,7 @@
                     "data_path": "action_result.data.*.value.*.proxyAddresses",
                     "data_type": "string",
                     "example_values": [
-                        "SMTP:test_shared_mailbox@testphantom.onmicrosoft.com"
+                        "SMTP:test_shared_mailbox@test.onmicrosoft.com"
                     ]
                 },
                 {
@@ -1257,7 +1256,7 @@
                     "data_type": "string",
                     "example_values": [
                         "Status: Successfully retrieved user attributes",
-                        "Status: Successfully retrieved attributes for user luke@testphantom.onmicrosoft.com, User enabled: False"
+                        "Status: Successfully retrieved attributes for user user@test.onmicrosoft.com, User enabled: False"
                     ]
                 },
                 {
@@ -1265,7 +1264,7 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully retrieved user attributes",
-                        "Successfully retrieved attributes for user luke@testphantom.onmicrosoft.com"
+                        "Successfully retrieved attributes for user user@test.onmicrosoft.com"
                     ]
                 },
                 {
@@ -1286,7 +1285,7 @@
                     "data_path": "action_result.data.*.value.*.odata.metadata",
                     "data_type": "string",
                     "example_values": [
-                        "https://graph.windows.net/1e309abf-db6c-4fcb-a1d2-07bf6824d58d/$metadata#directoryObjects/@Element"
+                        "https://graph.windows.net/2e799abf-db6c-4fcb-a1d2-07bf1824d58d/$metadata#directoryObjects/@Element"
                     ],
                     "contains": [
                         "url"
@@ -1296,7 +1295,7 @@
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "example_values": [
-                        "luke@testphantom.onmicrosoft.com"
+                        "user@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "azure user principal name",
@@ -1315,15 +1314,16 @@
             ],
             "render": {
                 "type": "custom",
+                "title": "List User Attributes",
                 "view": "azureadgraph_view.display_list_user_attributes"
             },
             "versions": "EQ(*)"
         },
         {
             "action": "set user attribute",
-            "identifier": "set_user_attribute",
             "description": "Set an attribute for a user",
             "type": "generic",
+            "identifier": "set_user_attribute",
             "read_only": false,
             "parameters": {
                 "user_id": {
@@ -1375,7 +1375,7 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Status: Successfully enabled user matt@testphantom.onmicrosoft.com"
+                        "Status: Successfully enabled user user@test.onmicrosoft.com"
                     ]
                 },
                 {
@@ -1389,7 +1389,7 @@
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "example_values": [
-                        "matt@testphantom.onmicrosoft.com"
+                        "user@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "azure user principal name",
@@ -1408,7 +1408,7 @@
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully enabled user matt@testphantom.onmicrosoft.com"
+                        "Successfully enabled user user@test.onmicrosoft.com"
                     ],
                     "column_name": "Status",
                     "column_order": 0
@@ -1435,10 +1435,9 @@
         },
         {
             "action": "remove user",
-            "undo": "add user",
-            "identifier": "remove_user",
             "description": "Remove a user from a specified group",
             "type": "generic",
+            "identifier": "remove_user",
             "read_only": false,
             "parameters": {
                 "object_id": {
@@ -1538,10 +1537,9 @@
         },
         {
             "action": "add user",
-            "undo": "remove user",
-            "identifier": "add_user",
             "description": "Add a user to the tenant by creating an organzational account",
             "type": "generic",
+            "identifier": "add_user",
             "read_only": false,
             "parameters": {
                 "object_id": {
@@ -1561,9 +1559,7 @@
                     "primary": true,
                     "order": 1,
                     "contains": [
-                        "azure user principal name",
-                        "azure object id",
-                        "email"
+                        "azure object id"
                     ]
                 }
             },
@@ -1594,9 +1590,7 @@
                         "17be76d0-35ed-4881-ab62-d2eb73c2ebe3"
                     ],
                     "contains": [
-                        "azure user principal name",
-                        "azure object id",
-                        "email"
+                        "azure object id"
                     ]
                 },
                 {
@@ -1641,9 +1635,9 @@
         },
         {
             "action": "list groups",
-            "identifier": "list_groups",
             "description": "List groups in organization",
             "type": "generic",
+            "identifier": "list_groups",
             "read_only": true,
             "parameters": {},
             "output": [
@@ -1658,7 +1652,7 @@
                     "data_path": "action_result.data.*.odata.metadata",
                     "data_type": "string",
                     "example_values": [
-                        "https://graph.windows.net/1e309abf-db6c-4fcb-a1d2-07bf6824d58d/$metadata#directoryObjects"
+                        "https://graph.windows.net/2e799abf-db6c-4fcb-a1d2-07bf1824d58d/$metadata#directoryObjects"
                     ],
                     "contains": [
                         "url"
@@ -1736,7 +1730,7 @@
                     "data_path": "action_result.data.*.value.*.proxyAddresses",
                     "data_type": "string",
                     "example_values": [
-                        "SMTP:test-h@testphantom.onmicrosoft.com"
+                        "SMTP:test-h@test.onmicrosoft.com"
                     ]
                 },
                 {
@@ -1754,7 +1748,7 @@
                     "data_path": "action_result.data.*.value.*.mail",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom-test-site@testphantom.onmicrosoft.com"
+                        "Phantom-test-site@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "email"
@@ -1815,9 +1809,9 @@
         },
         {
             "action": "get group",
-            "identifier": "get_group",
             "description": "Get a group",
             "type": "generic",
+            "identifier": "get_group",
             "read_only": true,
             "parameters": {
                 "object_id": {
@@ -1893,7 +1887,7 @@
                     "data_path": "action_result.data.*.odata.metadata",
                     "data_type": "string",
                     "example_values": [
-                        "https://graph.windows.net/1e309abf-db6c-4fcb-a1d2-07bf6824d58d/$metadata#directoryObjects/@Element"
+                        "https://graph.windows.net/2e799abf-db6c-4fcb-a1d2-07bf1824d58d/$metadata#directoryObjects/@Element"
                     ],
                     "contains": [
                         "url"
@@ -1921,7 +1915,7 @@
                     "data_path": "action_result.data.*.proxyAddresses",
                     "data_type": "string",
                     "example_values": [
-                        "SMTP:bc7f9cabe@testphantom.onmicrosoft.com"
+                        "SMTP:bc7f9cabe@test.onmicrosoft.com"
                     ]
                 },
                 {
@@ -1939,7 +1933,7 @@
                     "data_path": "action_result.data.*.mail",
                     "data_type": "string",
                     "example_values": [
-                        "bc7f9cabe@testphantom.onmicrosoft.com"
+                        "bc7f9cabe@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "email"
@@ -2012,9 +2006,9 @@
         },
         {
             "action": "list group members",
-            "identifier": "list_group_members",
             "description": "List the members in a group",
             "type": "generic",
+            "identifier": "list_group_members",
             "read_only": true,
             "parameters": {
                 "object_id": {
@@ -2040,7 +2034,7 @@
                     "data_path": "action_result.data.*.displayName",
                     "data_type": "string",
                     "example_values": [
-                        "Matthew Tichenor"
+                        "Firstname Lastname"
                     ],
                     "column_name": "Display Name",
                     "column_order": 0
@@ -2103,9 +2097,9 @@
         },
         {
             "action": "validate group",
-            "identifier": "validate_group",
             "description": "Returns true if a user is in a group; otherwise, false",
             "type": "generic",
+            "identifier": "validate_group",
             "read_only": true,
             "parameters": {
                 "object_id": {
@@ -2160,7 +2154,7 @@
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "example_values": [
-                        "pratikp@testphantom.onmicrosoft.com"
+                        "user@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "azure user principal name",
@@ -2184,6 +2178,139 @@
                     "example_values": [
                         true,
                         false
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "list directory roles",
+            "description": "List the directory roles in a tenant",
+            "type": "generic",
+            "identifier": "list_directory_roles",
+            "read_only": true,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.odata.metadata",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://graph.windows.net/2e799abf-db6c-4fcb-a1d2-07bf1824d58d/$metadata#directoryObjects"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.odata.type",
+                    "data_type": "string",
+                    "example_values": [
+                        "Microsoft.DirectoryServices.DirectoryRole"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.roleTemplateId",
+                    "data_type": "string",
+                    "example_values": [
+                        "88d8e3e3-8f55-4a1e-953a-9b9898b8876b"
+                    ],
+                    "contains": [
+                        "azure role template id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.displayName",
+                    "data_type": "string",
+                    "example_values": [
+                        "Directory Readers"
+                    ],
+                    "column_name": "Display Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Can read basic directory information. For granting access to applications, not intended for users."
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.objectId",
+                    "data_type": "string",
+                    "example_values": [
+                        "02b238cb-0d15-454b-aae6-0e94993a3207"
+                    ],
+                    "contains": [
+                        "azure object id"
+                    ],
+                    "column_name": "Object ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.deletionTimestamp",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.roleDisabled",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Disabled",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.isSystem",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value.*.objectType",
+                    "data_type": "string",
+                    "example_values": [
+                        "Role"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Num directory roles: 9"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_directory_roles",
+                    "data_type": "numeric",
+                    "example_values": [
+                        9
                     ]
                 },
                 {

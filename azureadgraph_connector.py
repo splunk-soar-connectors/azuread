@@ -1,5 +1,5 @@
 # File: azureadgraph_connector.py
-# Copyright (c) 2018-2019 Splunk Inc.
+# Copyright (c) 2019 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -476,7 +476,8 @@ class AzureADGraphConnector(BaseConnector):
         headers.update({
                 'Authorization': 'Bearer {0}'.format(self._access_token),
                 'Accept': 'application/json',
-                'Content-Type': 'application/json'})
+                'Content-Type': 'application/json'
+            })
 
         ret_val, resp_json = self._make_rest_call(url, action_result, verify, headers, params, data, json, method)
 
@@ -1029,6 +1030,26 @@ class AzureADGraphConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_list_directory_roles(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        parameters = {'api-version': '1.6'}
+
+        endpoint = '/directoryRoles'
+        ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        action_result.add_data(response)
+
+        summary = action_result.update_summary({})
+        summary['num_directory_roles'] = len(response.get('value', []))
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _handle_validate_group(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -1195,8 +1216,11 @@ class AzureADGraphConnector(BaseConnector):
         elif action_id == 'validate_group':
             ret_val = self._handle_validate_group(param)
 
-        elif action_id == 'list_domains':
-            ret_val = self._handle_list_domains(param)
+        elif action_id == 'list_directory_roles':
+            ret_val = self._handle_list_directory_roles(param)
+
+        elif action_id == 'list_policies':
+            ret_val = self._handle_list_policies(param)
 
         return ret_val
 

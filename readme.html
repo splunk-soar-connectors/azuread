@@ -1,5 +1,5 @@
 <!-- File: readme.html
-  Copyright (c) 2018-2019 Splunk Inc.
+  Copyright (c) 2019 Splunk Inc.
 
   SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
   without a valid written license from Splunk Inc. is PROHIBITED.
@@ -12,7 +12,7 @@ This app requires creating a Microsoft App Registration in Azure Portal. To do s
 <br><br>
 On the next level menu just to the right of the first one, select <b>App Registrations</b>.
 <br><br>
-At the top of the middle section, select <b>New application registration</b>.
+At the top of the middle section, select <b>New registration</b>.
 <br><br>
 Enter a name, select <b>Native</b> under application type and type <b>https://phantom.local</b> as a placeholder in the Redirect URI field.  You will update this later. Click somewhere else in the main screen to remove focus from the input fields and then click <b>Create</b> at the bottom of the window.
 <br><br>
@@ -36,7 +36,7 @@ When creating an asset for the <b>Azure AD Graph API</b> app, place <b>Applicati
 After saving, a new field will appear in the <b>Asset Settings</b> tab. Take the URL found in the <b>POST incoming for Azure AD Graph API to this location</b> field and place it in the <b>Redirect URIs</b> field mentioned above. To this URL, add <b>/result</b>. After doing so the URL should look something like:
 <br><br>
 <pre>
-https://&lt;phantom_host&gt;/rest/handler/azureadgraphapi_0a0a4087-10e8-4c96-9872-b740ff26d8bb/&lt;asset_name&gt;/result
+https://&lt;phantom_host&gt;/rest/handler/azureadgraph_c6d3b801-5c26-4abd-9e89-6d8007e2778f/&lt;asset_name&gt;/result
 </pre>
 <br>
 Once again, click save at the top of the screen.
