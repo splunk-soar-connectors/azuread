@@ -228,7 +228,6 @@ class AzureADGraphConnector(BaseConnector):
         self._tenant = None
         self._client_id = None
         self._client_secret = None
-        self._admin_access = True
         self._access_token = None
         self._refresh_token = None
 
@@ -496,71 +495,6 @@ class AzureADGraphConnector(BaseConnector):
 
         return phantom.APP_SUCCESS, resp_json
 
-    def _get_admin_access(self, action_result, app_rest_url):
-        """ This function is used to get admin access for given credentials.
-
-        :param action_result: Object of action result
-        :param app_rest_url: REST URL created for app
-        :return: status success/failure
-        """
-
-        # Create the url authorization, this is the one pointing to the oauth server side
-        admin_consent_url = "https://login.microsoftonline.com/{0}/adminconsent".format(self._tenant)
-        admin_consent_url += "?client_id={0}".format(self._client_id)
-        admin_consent_url += "&redirect_uri={0}".format(self._state['redirect_uri'])
-        admin_consent_url += "&state={0}".format(self.get_asset_id())
-
-        self._state['admin_consent_url'] = admin_consent_url
-
-        # The URL that the user should open in a different tab.
-        # This is pointing to a REST endpoint that points to the app
-        url_to_show = "{0}/start_oauth?asset_id={1}&".format(app_rest_url, self.get_asset_id())
-
-        # Save the state, will be used by the request handler
-        _save_app_state(self._state, self.get_asset_id(), self)
-
-        self.save_progress(MS_AUTHORIZE_USER_MSG)
-        self.save_progress(url_to_show)
-
-        time.sleep(5)
-
-        completed = False
-
-        app_dir = os.path.dirname(os.path.abspath(__file__))
-        auth_status_file_path = "{0}/{1}_{2}".format(app_dir, self.get_asset_id(), TC_FILE)
-
-        self.save_progress('Waiting for authorization to complete')
-
-        for i in range(0, 40):
-
-            self.send_progress('{0}'.format('.' * (i % 10)))
-
-            if (os.path.isfile(auth_status_file_path)):
-                completed = True
-                os.unlink(auth_status_file_path)
-                break
-
-            time.sleep(MS_TC_STATUS_SLEEP)
-
-        if (not completed):
-            self.save_progress("Authentication process does not seem to be completed. Timing out")
-            return self.set_status(phantom.APP_ERROR)
-
-        self.send_progress("")
-
-        # Load the state again, since the http request handlers would have saved the result of the admin consent
-        self._state = _load_app_state(self.get_asset_id(), self)
-
-        if not self._state:
-            self.save_progress("Authorization not received or not given")
-            self.save_progress("Test Connectivity Failed")
-            return self.set_status(phantom.APP_ERROR)
-
-        # The authentication seems to be done, let's see if it was successfull
-        self._state['admin_consent'] = self._state.get('admin_consent', False)
-
-        return self.set_status(phantom.APP_SUCCESS)
-
     def _handle_test_connectivity(self, param):
         """ Function that handles the test connectivity action, it is much simpler than other action handlers."""
 
@@ -586,11 +520,6 @@ class AzureADGraphConnector(BaseConnector):
 
         self.save_progress(MS_OAUTH_URL_MSG)
         self.save_progress(redirect_uri)
-
-        if self._admin_access:
-            result = self._get_admin_access(action_result, app_rest_url)
-            if (phantom.is_fail(result)):
-                return self.get_status()
 
         admin_consent_url = "https://login.microsoftonline.com/{0}/oauth2/authorize".format(self._tenant)
         admin_consent_url += "?client_id={0}".format(self._client_id)
@@ -691,11 +620,12 @@ class AzureADGraphConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        # Add the response into the data section
-        action_result.add_data(response)
+        value = response.get('value', [])
+        for item in value:
+            action_result.add_data(item)
 
         summary = action_result.update_summary({})
-        summary['num_users'] = len(response.get('value', []))
+        summary['num_users'] = len(value)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -838,11 +768,13 @@ class AzureADGraphConnector(BaseConnector):
 
         summary = action_result.update_summary({})
         if user_id:
-            action_result.add_data({ 'value': [response] })
+            action_result.add_data(response)
             summary['status'] = "Successfully retrieved attributes for user {}".format(user_id)
             summary['user_enabled'] = response.get('accountEnabled')
         else:
-            action_result.add_data(response)
+            value = response.get('value', [])
+            for item in value:
+                action_result.add_data(item)
             summary['status'] = "Successfully retrieved user attributes"
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -943,10 +875,12 @@ class AzureADGraphConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        action_result.add_data(response)
+        value = response.get('value', [])
+        for item in value:
+            action_result.add_data(item)
 
         summary = action_result.update_summary({})
-        summary['num_groups'] = len(response.get('value', []))
+        summary['num_groups'] = len(value)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1043,10 +977,12 @@ class AzureADGraphConnector(BaseConnector):
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        action_result.add_data(response)
+        value = response.get('value', [])
+        for item in value:
+            action_result.add_data(item)
 
         summary = action_result.update_summary({})
-        summary['num_directory_roles'] = len(response.get('value', []))
+        summary['num_directory_roles'] = len(value)
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -1240,7 +1176,6 @@ class AzureADGraphConnector(BaseConnector):
         self._tenant = config[MS_AZURE_CONFIG_TENANT].encode('utf-8')
         self._client_id = config[MS_AZURE_CONFIG_CLIENT_ID].encode('utf-8')
         self._client_secret = config[MS_AZURE_CONFIG_CLIENT_SECRET].encode('utf-8')
-        self._admin_access = config.get(MS_AZURE_CONFIG_ADMIN_ACCESS)
         self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING)
 

@@ -78,54 +78,48 @@ background-repeat: no-repeat; background-image: url('/app_resource/{{ title_logo
 
     {% if result.data %}
         {% for curr_data in result.data %}
-            {% if curr_data.value %}
-                {% for item in curr_data.value %}
-                    <!------------------- For each user ---------------------->
-                    <!-- {{ item }} -->
-                    <h3 class="wf-h3-style">{{ item.displayName }}</h3>
-                    <table class="wf-table-horizontal">
-                        <tr>
-                            <th>Account Enabled</th>
-                            <td>{{ item.accountEnabled }}</td>
-                        </tr>
-                        <tr>
-                            <th>User Type</th>
-                            <td>{{ item.userType }}</td>
-                        </tr>
-                        <tr>
-                            <th>Object Type</th>
-                            <td>{{ item.objectType }}</td>
-                        </tr>
-                        <tr>
-                            <th>Mail Nickname</th>
-                            <td>{{ item.mailNickname }}</td>
-                        </tr>
-                        <tr>
-                            <th>Usage Location</th>
-                            <td>{{ item.usageLocation }}</td>
-                        </tr>
-                        <tr>
-                            <th>User Principal Name</th>
-                            <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['email', 'azure user principal name'], 'value': '{{ item.userPrincipalName }}' }], 0, {{ container.id }}, null, false);">
-                                {{ item.userPrincipalName }}
-                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                            </a></td>
-                        </tr>
-                        <tr>
-                            <th>Job Title</th>
-                            <td>{{ item.jobTitle }}</td>
-                        </tr>
-                        <tr>
-                            <th>Object ID</th>
-                            <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['azure object id'], 'value': '{{ item.objectId }}' }], 0, {{ container.id }}, null, false);">
-                                {{ item.objectId }}
-                                &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
-                            </a></td>
-                        </tr>
-                    </table>
-                    <br>
-                {% endfor %}
-            {% endif %}
+            <h3 class="wf-h3-style">{{ curr_data.displayName }}</h3>
+                <table class="wf-table-horizontal">
+                    <tr>
+                        <th>Account Enabled</th>
+                        <td>{{ curr_data.accountEnabled }}</td>
+                    </tr>
+                    <tr>
+                        <th>User Type</th>
+                        <td>{{ curr_data.userType }}</td>
+                    </tr>
+                    <tr>
+                        <th>Object Type</th>
+                        <td>{{ curr_data.objectType }}</td>
+                    </tr>
+                    <tr>
+                        <th>Mail Nickname</th>
+                        <td>{{ curr_data.mailNickname }}</td>
+                    </tr>
+                    <tr>
+                        <th>Usage Location</th>
+                        <td>{{ curr_data.usageLocation }}</td>
+                    </tr>
+                    <tr>
+                        <th>User Principal Name</th>
+                        <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['email', 'azure user principal name'], 'value': '{{ curr_data.userPrincipalName }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_data.userPrincipalName }}
+                            &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a></td>
+                    </tr>
+                    <tr>
+                        <th>Job Title</th>
+                        <td>{{ curr_data.jobTitle }}</td>
+                    </tr>
+                    <tr>
+                        <th>Object ID</th>
+                        <td><a href="javascript:;" onclick="context_menu(this, [{'contains': ['azure object id'], 'value': '{{ curr_data.objectId }}' }], 0, {{ container.id }}, null, false);">
+                            {{ curr_data.objectId }}
+                            &nbsp;<span class="fa fa-caret-down" style="font-size: smaller;"></span>
+                        </a></td>
+                    </tr>
+                </table>
+                <br>
         {% endfor %}
     {% else %}
         <p> Could not retrieve data </p>
