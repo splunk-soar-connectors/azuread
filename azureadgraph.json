@@ -690,6 +690,7 @@
             "type": "generic",
             "identifier": "enable_user",
             "read_only": false,
+            "undo": "disable user",
             "parameters": {
                 "user_id": {
                     "description": "User ID to enable tokens of - can be user principal name or object ID",
@@ -770,6 +771,7 @@
             "type": "generic",
             "identifier": "disable_user",
             "read_only": false,
+            "undo": "enable user",
             "parameters": {
                 "user_id": {
                     "description": "User ID to change password - can be user principal name or object ID",
@@ -1410,8 +1412,9 @@
             "type": "generic",
             "identifier": "remove_user",
             "read_only": false,
+            "undo": "add user",
             "parameters": {
-                "object_id": {
+                "group_object_id": {
                     "description": "Object ID of group",
                     "data_type": "string",
                     "required": true,
@@ -1467,7 +1470,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.object_id",
+                    "data_path": "action_result.parameter.group_object_id",
                     "data_type": "string",
                     "example_values": [
                         "ddb876b3-603a-437b-9814-2d46a2219a1e"
@@ -1512,8 +1515,9 @@
             "type": "generic",
             "identifier": "add_user",
             "read_only": false,
+            "undo": "remove user",
             "parameters": {
-                "object_id": {
+                "group_object_id": {
                     "description": "Object ID of group",
                     "data_type": "string",
                     "required": true,
@@ -1565,7 +1569,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.object_id",
+                    "data_path": "action_result.parameter.group_object_id",
                     "data_type": "string",
                     "example_values": [
                         "ddb876b3-603a-437b-9814-2d46a2219a1e"
@@ -1962,7 +1966,7 @@
             "identifier": "list_group_members",
             "read_only": true,
             "parameters": {
-                "object_id": {
+                "user_object_id": {
                     "description": "Object ID of group",
                     "data_type": "string",
                     "required": true,
@@ -2010,7 +2014,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.object_id",
+                    "data_path": "action_result.parameter.user_object_id",
                     "data_type": "string",
                     "example_values": [
                         "ebcd3130-55a1-4cbf-81b2-86408ff21203"
@@ -2053,7 +2057,7 @@
             "identifier": "validate_group",
             "read_only": true,
             "parameters": {
-                "object_id": {
+                "group_object_id": {
                     "description": "Object ID of group",
                     "data_type": "string",
                     "required": true,
@@ -2114,7 +2118,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.object_id",
+                    "data_path": "action_result.parameter.group_object_id",
                     "data_type": "string",
                     "example_values": [
                         "ebcd3130-55a1-4cbf-81b2-86408ff21203"
