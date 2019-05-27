@@ -931,7 +931,7 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = param['user_object_id']
+        object_id = param['group_object_id']
         parameters = {'api-version': '1.6'}
 
         # Returns a list of group members' directory object URLs

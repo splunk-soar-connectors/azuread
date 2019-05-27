@@ -92,6 +92,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.ageGroup",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.assignedLicenses.*.skuId",
                     "data_type": "string",
                     "example_values": [
@@ -134,6 +141,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.companyName",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.consentProvidedForMinor",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.country",
                     "data_type": "string",
                     "example_values": [
@@ -141,10 +162,38 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.createdDateTime",
+                    "data_type": "string",
+                    "example_values": [
+                        "2019-05-21T22:27:20Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.creationType",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.deletionTimestamp",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.department",
                     "data_type": "string",
                     "example_values": [
                         "Stuff"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.dirSyncEnabled",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
                     ]
                 },
                 {
@@ -157,6 +206,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.employeeId",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.facsimileTelephoneNumber",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.givenName",
                     "data_type": "string",
                     "example_values": [
@@ -164,10 +227,38 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.immutableId",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.isCompromised",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.jobTitle",
                     "data_type": "string",
                     "example_values": [
                         "Dude"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.lastDirSyncTime",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.legalAgeGroupClassification",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
                     ]
                 },
                 {
@@ -221,6 +312,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.onPremisesDistinguishedName",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.onPremisesSecurityIdentifier",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.otherMails",
                     "data_type": "string",
                     "example_values": [
@@ -239,6 +344,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.passwordProfile",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.passwordProfile.enforceChangePasswordPolicy",
                     "data_type": "boolean",
                     "example_values": [
@@ -252,6 +364,20 @@
                     "example_values": [
                         true,
                         false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.passwordProfile.password",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.physicalDeliveryOfficeName",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
                     ]
                 },
                 {
@@ -306,6 +432,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.showInAddressList",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.sipProxyAddress",
                     "data_type": "string",
                     "example_values": [
@@ -337,6 +470,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.telephoneNumber",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.thumbnailPhoto@odata.mediaEditLink",
+                    "data_type": "string",
+                    "example_values": [
+                        "directoryObjects/6132ca31-7a09-434f-a269-abe836d0c01e/Microsoft.DirectoryServices.User/thumbnailPhoto"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.usageLocation",
                     "data_type": "string",
                     "example_values": [
@@ -357,10 +504,31 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.userState",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.userStateChangedOn",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.userType",
                     "data_type": "string",
                     "example_values": [
                         "Member"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.num_users",
+                    "data_type": "numeric",
+                    "example_values": [
+                        8
                     ]
                 },
                 {
@@ -858,7 +1026,7 @@
             "read_only": true,
             "parameters": {
                 "user_id": {
-                    "description": "User ID to change password - can be user principal name or object ID",
+                    "description": "User ID - can be user principal name or object ID",
                     "data_type": "string",
                     "required": false,
                     "primary": true,
@@ -1304,7 +1472,7 @@
             "read_only": false,
             "parameters": {
                 "user_id": {
-                    "description": "User ID to change password - can be user principal name or object ID",
+                    "description": "User ID - can be user principal name or object ID",
                     "data_type": "string",
                     "required": true,
                     "primary": true,
@@ -1592,9 +1760,7 @@
                     "example_values": [
                         "Successfully added user to group",
                         "User already in group"
-                    ],
-                    "column_order": 0,
-                    "column_name": "Status"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
@@ -1899,6 +2065,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.odata.metadata",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://graph.windows.net/1e309abf-db6c-4fcb-a1d2-07bf6824d58d/$metadata#directoryObjects/@Element"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.odata.type",
                     "data_type": "string",
                     "example_values": [
@@ -1982,7 +2155,7 @@
             "identifier": "list_group_members",
             "read_only": true,
             "parameters": {
-                "user_object_id": {
+                "group_object_id": {
                     "description": "Object ID of group",
                     "data_type": "string",
                     "required": true,
@@ -1999,6 +2172,13 @@
                     "data_type": "string",
                     "example_values": [
                         "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.group_object_id",
+                    "data_type": "string",
+                    "contains": [
+                        "azure object id"
                     ]
                 },
                 {
