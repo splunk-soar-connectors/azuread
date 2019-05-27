@@ -1045,7 +1045,7 @@ class AzureADGraphConnector(BaseConnector):
                 'refresh_token': refresh_token,
                 'resource': 'https://graph.windows.net/'}
 
-        ret_val, resp_json = _make_rest_call(action_result, req_url, data=data, method="post")
+        ret_val, resp_json = self._make_rest_call(req_url, action_result, data=data, method="post")
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
