@@ -488,7 +488,7 @@ class AzureADGraphConnector(BaseConnector):
 
             headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
 
-            ret_val, resp_json = self._make_rest_call(url, action_result, verify, headers, params, data, method)
+            ret_val, resp_json = self._make_rest_call(url, action_result, verify, headers, params, data, json, method)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
@@ -660,43 +660,6 @@ class AzureADGraphConnector(BaseConnector):
 
         # An empty response indicates success. No response body is returned.
         return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_invalidate_tokens(self, param):
-
-        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
-        action_result = self.add_action_result(ActionResult(dict(param)))
-
-        user_id = param['user_id']
-        parameters = {'api-version': '1.6'}
-        endpoint = '/users/{0}/invalidateAllRefreshTokens'.format(user_id)
-
-        ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='post')
-
-        if (phantom.is_fail(ret_val)):
-            return action_result.get_status()
-
-        action_result.add_data(response)
-
-        summary = action_result.update_summary({})
-        summary['status'] = "Successfully disabled tokens"
-
-        return action_result.set_status(phantom.APP_SUCCESS)
-
-    def _handle_generate_token(self, param):
-        """ This function is used to handle the generate token action.
-
-        :param param: Dictionary of input parameters
-        :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
-        """
-
-        action_result = self.add_action_result(ActionResult(dict(param)))
-        ret_val = self._get_token(action_result)
-        if (phantom.is_fail(ret_val)):
-            return action_result.get_status()
-
-        self._state['admin_consent'] = True
-
-        return action_result.set_status(phantom.APP_SUCCESS, "Token generated")
 
     def _handle_enable_user(self, param):
 
@@ -1026,36 +989,6 @@ class AzureADGraphConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _get_refresh_token(self, action_result):
-
-        config = self.get_config()
-        client_id = config['client_id']
-        tenant = config['tenant']
-
-        token = self._state.get('token', None)
-        if not token:
-            return action_result.set_status(phantom.APP_ERROR,
-                    "Please Run test connectivity first to get an admin consent and obtain an initial token")
-
-        refresh_token = token.get('refresh_token')
-        req_url = SERVER_TOKEN_URL.format(tenant)
-        data = {
-                'grant_type': 'refresh_token',
-                'client_id': client_id,
-                'refresh_token': refresh_token,
-                'resource': 'https://graph.windows.net/'}
-
-        ret_val, resp_json = self._make_rest_call(req_url, action_result, data=data, method="post")
-
-        if (phantom.is_fail(ret_val)):
-            return action_result.get_status()
-
-        self._state['token'] = resp_json
-        self.save_state(self._state)
-        _save_app_state(self._state, self.get_asset_id(), self)
-
-        return (phantom.APP_SUCCESS)
-
     def _get_token(self, action_result, from_action=False):
         """ This function is used to get a token via REST Call.
 
@@ -1112,12 +1045,6 @@ class AzureADGraphConnector(BaseConnector):
 
         elif action_id == 'reset_password':
             ret_val = self._handle_reset_password(param)
-
-        elif action_id == 'invalidate_tokens':
-            ret_val = self._handle_invalidate_tokens(param)
-
-        elif action_id == 'generate_token':
-            ret_val = self._handle_generate_token(param)
 
         elif action_id == 'enable_user':
             ret_val = self._handle_enable_user(param)
