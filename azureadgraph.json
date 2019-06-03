@@ -596,9 +596,9 @@
                     ]
                 },
                 "force_change": {
-                    "description": "Force user to change password on next login?",
+                    "description": "Force user to change password on next login",
                     "data_type": "boolean",
-                    "required": true,
+                    "required": false,
                     "default": true,
                     "order": 1
                 },
@@ -2016,13 +2016,6 @@
                 },
                 {
                     "data_path": "action_result.parameter.group_object_id",
-                    "data_type": "string",
-                    "contains": [
-                        "azure object id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.user_object_id",
                     "data_type": "string",
                     "example_values": [
                         "ebcd3130-55a1-4cbf-81b2-86408ff21203"
