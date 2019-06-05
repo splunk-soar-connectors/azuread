@@ -687,6 +687,27 @@ class AzureADGraphConnector(BaseConnector):
         # An empty response indicates success. No response body is returned.
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _handle_invalidate_tokens(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        user_id = param['user_id']
+        parameters = {'api-version': '1.6'}
+        endpoint = '/users/{0}/invalidateAllRefreshTokens'.format(user_id)
+
+        ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='post')
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        action_result.add_data(response)
+
+        summary = action_result.update_summary({})
+        summary['status'] = "Successfully disabled tokens"
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def _handle_disable_user(self, param):
 
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
@@ -1045,6 +1066,9 @@ class AzureADGraphConnector(BaseConnector):
 
         elif action_id == 'reset_password':
             ret_val = self._handle_reset_password(param)
+
+        elif action_id == 'invalidate_tokens':
+            ret_val = self._handle_invalidate_tokens(param)
 
         elif action_id == 'enable_user':
             ret_val = self._handle_enable_user(param)

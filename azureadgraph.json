@@ -693,6 +693,112 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "disable tokens",
+            "description": "Invalidate all active refresh tokens for a user in an Azure AD environment",
+            "type": "contain",
+            "identifier": "invalidate_tokens",
+            "read_only": false,
+            "parameters": {
+                "user_id": {
+                    "description": "User ID to disable tokens of - can be user principal name or object ID",
+                    "data_type": "string",
+                    "required": true,
+                    "primary": true,
+                    "order": 0,
+                    "contains": [
+                        "azure user principal name",
+                        "azure object id",
+                        "email"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.user_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "ee3dc4f2-70f9-446f-a19e-6b4e95ba030d",
+                        "user@test.onmicrosoft.com"
+                    ],
+                    "contains": [
+                        "azure user principal name",
+                        "azure object id",
+                        "email"
+                    ],
+                    "column_name": "User ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.odata.metadata",
+                    "data_type": "string",
+                    "example_values": [
+                        "https://graph.windows.net/2e799abf-db6c-4fcb-a1d2-07bf1824d58d/$metadata#Edm.Null"
+                    ],
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.odata.null",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully disabled tokens"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully invalidated tokens",
+                        "",
+                        "Status: Successfully disabled tokens"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "width": 12,
+                "title": "Invalidate Tokens",
+                "type": "table",
+                "height": 5
+            },
+            "versions": "EQ(*)"
+        },
+        {
             "action": "enable user",
             "description": "Enable a user",
             "type": "generic",
