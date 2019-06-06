@@ -80,7 +80,7 @@
                     "data_path": "action_result.parameter.filter_string",
                     "data_type": "string",
                     "example_values": [
-                        "startswith(displayName,'Herman')"
+                        "startswith(displayName,'test')"
                     ]
                 },
                 {
@@ -202,7 +202,7 @@
                     "column_name": "Display Name",
                     "column_order": 0,
                     "example_values": [
-                        "Herman Edwards"
+                        "test"
                     ]
                 },
                 {
@@ -223,7 +223,7 @@
                     "data_path": "action_result.data.*.givenName",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "test"
                     ]
                 },
                 {
@@ -265,7 +265,7 @@
                     "data_path": "action_result.data.*.mail",
                     "data_type": "string",
                     "example_values": [
-                        "Herman@test.onmicrosoft.com"
+                        "test@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "email"
@@ -275,7 +275,7 @@
                     "data_path": "action_result.data.*.mailNickname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "test"
                     ]
                 },
                 {
@@ -329,8 +329,8 @@
                     "data_path": "action_result.data.*.otherMails",
                     "data_type": "string",
                     "example_values": [
-                        "herman.phantom@outlook.com",
-                        "herman@phantom.us"
+                        "test.test@outlook.com",
+                        "test@test.us"
                     ],
                     "contains": [
                         "email"
@@ -420,7 +420,7 @@
                     "data_type": "string",
                     "example_values": [
                         "SMTP:test2@test.onmicrosoft.com",
-                        "SMTP:Herman@test.onmicrosoft.com"
+                        "SMTP:test@test.onmicrosoft.com"
                     ]
                 },
                 {
@@ -442,7 +442,7 @@
                     "data_path": "action_result.data.*.sipProxyAddress",
                     "data_type": "string",
                     "example_values": [
-                        "Herman@test.onmicrosoft.com"
+                        "test@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "email"
@@ -466,7 +466,7 @@
                     "data_path": "action_result.data.*.surname",
                     "data_type": "string",
                     "example_values": [
-                        "Edwards"
+                        "test"
                     ]
                 },
                 {
@@ -496,7 +496,7 @@
                     "column_name": "User Principal Name",
                     "column_order": 2,
                     "example_values": [
-                        "Herman@test.onmicrosoft.com"
+                        "test@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "email",
@@ -1160,7 +1160,7 @@
                     "data_path": "action_result.data.*.mailNickname",
                     "data_type": "string",
                     "example_values": [
-                        "Herman"
+                        "test"
                     ]
                 },
                 {
@@ -1203,7 +1203,7 @@
                     "data_path": "action_result.data.*.otherMails",
                     "data_type": "string",
                     "example_values": [
-                        "user@testphantom.com"
+                        "user@test.com"
                     ],
                     "contains": [
                         "email"
@@ -1772,7 +1772,7 @@
                     "data_path": "action_result.data.*.displayName",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom-test-site"
+                        "Test-test-site"
                     ],
                     "column_name": "Display Name",
                     "column_order": 0
@@ -1785,7 +1785,7 @@
                     "data_path": "action_result.data.*.mail",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom-test-site@test.onmicrosoft.com"
+                        "Test-test-site@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "email"
@@ -1803,7 +1803,7 @@
                     "data_path": "action_result.data.*.mailNickname",
                     "data_type": "string",
                     "example_values": [
-                        "Phantom-test-site"
+                        "Test-test-site"
                     ]
                 },
                 {
