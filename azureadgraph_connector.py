@@ -44,11 +44,13 @@ def _handle_login_redirect(request, key):
 
     asset_id = request.GET.get('asset_id')
     if not asset_id:
-        return HttpResponse('ERROR: Asset ID not found in URL')
+        return HttpResponse('ERROR: Asset ID not found in URL', content_type="text/plain", status=400)
     state = _load_app_state(asset_id)
+    if not state:
+        return HttpResponse('ERROR: Invalid asset_id', content_type="text/plain", status=400)
     url = state.get(key)
     if not url:
-        return HttpResponse('App state is invalid, {key} not found.'.format(key=key))
+        return HttpResponse('App state is invalid, {key} not found.'.format(key=key), content_type="text/plain", status=400)
     response = HttpResponse(status=302)
     response['Location'] = url
     return response
@@ -62,8 +64,20 @@ def _load_app_state(asset_id, app_connector=None):
     :return: state: Current state file as a dictionary
     """
 
-    dirpath = os.path.split(__file__)[0]
-    state_file = '{0}/{1}_state.json'.format(dirpath, asset_id)
+    asset_id = str(asset_id)
+    if not asset_id or not asset_id.isalnum():
+        if app_connector:
+            app_connector.debug_print('In _load_app_state: Invalid asset_id')
+        return {}
+
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    state_file = '{0}/{1}_state.json'.format(app_dir, asset_id)
+    real_state_file_path = os.path.realpath(state_file)
+    if not os.path.dirname(real_state_file_path) == app_dir:
+        if app_connector:
+            app_connector.debug_print('In _load_app_state: Invalid asset_id')
+        return {}
+
     state = {}
     try:
         with open(state_file, 'r') as state_file_obj:
@@ -75,6 +89,7 @@ def _load_app_state(asset_id, app_connector=None):
 
     if app_connector:
         app_connector.debug_print('Loaded state: ', state)
+
     return state
 
 
@@ -87,7 +102,7 @@ def _save_app_state(state, asset_id, app_connector):
     :return: status: phantom.APP_SUCCESS
     """
 
-    dirpath = os.path.split(__file__)[0]
+     = os.path.split(__file__)[0]
     state_file = '{0}/{1}_state.json'.format(dirpath, asset_id)
 
     if app_connector:
@@ -164,7 +179,7 @@ def _handle_rest_request(request, path_parts):
     """
 
     if len(path_parts) < 2:
-        return HttpResponse('error: True, message: Invalid REST endpoint request')
+        return HttpResponse('error: True, message: Invalid REST endpoint request', content_type="text/plain", status=400)
 
     call_type = path_parts[1]
 
