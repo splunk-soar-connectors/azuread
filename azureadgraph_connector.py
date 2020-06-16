@@ -111,7 +111,7 @@ def _handle_login_response(request):
 
     asset_id = request.GET.get('state')
     if not asset_id:
-        return HttpResponse('ERROR: Asset ID not found in URL\n{}'.format(json.dumps(request.GET)))
+        return HttpResponse('ERROR: Asset ID not found in URL\n{}'.format(json.dumps(request.GET)), content_type="text/plain", status=400)
 
     # Check for error in URL
     error = request.GET.get('error')
@@ -122,14 +122,14 @@ def _handle_login_response(request):
         message = 'Error: {0}'.format(error)
         if error_description:
             message = '{0} Details: {1}'.format(message, error_description)
-        return HttpResponse('Server returned {0}'.format(message))
+        return HttpResponse('Server returned {0}'.format(message), content_type="text/plain", status=400)
 
     code = request.GET.get('code')
     admin_consent = request.GET.get('admin_consent')
 
     # If none of the code or admin_consent is available
     if not (code or admin_consent):
-        return HttpResponse('Error while authenticating\n{0}'.format(json.dumps(request.GET)))
+        return HttpResponse('Error while authenticating\n{0}'.format(json.dumps(request.GET)), content_type="text/plain", status=400)
 
     state = _load_app_state(asset_id)
 
@@ -145,14 +145,14 @@ def _handle_login_response(request):
 
         # If admin_consent is True
         if admin_consent:
-            return HttpResponse('Admin Consent received. Please close this window.')
-        return HttpResponse('Admin Consent declined. Please close this window and try again later.')
+            return HttpResponse('Admin Consent received. Please close this window.', content_type="text/plain")
+        return HttpResponse('Admin Consent declined. Please close this window and try again later.', content_type="text/plain", status=400)
 
     # If value of admin_consent is not available, value of code is available
     state['code'] = code
     _save_app_state(state, asset_id, None)
 
-    return HttpResponse('Code received. Please close this window, the action will continue to get new token.')
+    return HttpResponse('Code received. Please close this window, the action will continue to get new token.', content_type="text/plain")
 
 
 def _handle_rest_request(request, path_parts):
@@ -193,7 +193,7 @@ def _handle_rest_request(request, path_parts):
                 pass
 
         return return_val
-    return HttpResponse('error: Invalid endpoint')
+    return HttpResponse('error: Invalid endpoint', content_type="text/plain", status=404)
 
 
 def _get_dir_name_from_app_name(app_name):
