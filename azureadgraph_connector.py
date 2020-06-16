@@ -80,7 +80,7 @@ def _load_app_state(asset_id, app_connector=None):
 
     state = {}
     try:
-        with open(state_file, 'r') as state_file_obj:
+        with open(real_state_file_path, 'r') as state_file_obj:
             state_file_data = state_file_obj.read()
             state = json.loads(state_file_data)
     except Exception as e:
@@ -102,14 +102,26 @@ def _save_app_state(state, asset_id, app_connector):
     :return: status: phantom.APP_SUCCESS
     """
 
-     = os.path.split(__file__)[0]
-    state_file = '{0}/{1}_state.json'.format(dirpath, asset_id)
+    asset_id = str(asset_id)
+    if not asset_id or not asset_id.isalnum():
+        if app_connector:
+            app_connector.debug_print('In _load_app_state: Invalid asset_id')
+        return {}
+
+    app_dir = os.path.split(__file__)[0]
+    state_file = '{0}/{1}_state.json'.format(app_dir, asset_id)
+
+    real_state_file_path = os.path.realpath(state_file)
+    if not os.path.dirname(real_state_file_path) == app_dir:
+        if app_connector:
+            app_connector.debug_print('In _load_app_state: Invalid asset_id')
+        return {}
 
     if app_connector:
         app_connector.debug_print('Saving state: ', state)
 
     try:
-        with open(state_file, 'w+') as state_file_obj:
+        with open(real_state_file_path, 'w+') as state_file_obj:
             state_file_obj.write(json.dumps(state))
     except Exception as e:
         print 'Unable to save state file: {0}'.format(str(e))
