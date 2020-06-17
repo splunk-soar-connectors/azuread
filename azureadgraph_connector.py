@@ -207,9 +207,12 @@ def _handle_rest_request(request, path_parts):
     if call_type == 'result':
         return_val = _handle_login_response(request)
         asset_id = request.GET.get('state')
-        if asset_id:
+        if asset_id and asset_id.isalnum():
             app_dir = os.path.dirname(os.path.abspath(__file__))
             auth_status_file_path = '{0}/{1}_{2}'.format(app_dir, asset_id, TC_FILE)
+            real_auth_status_file_path = os.path.realpath(auth_status_file_path)
+            if not os.path.dirname(real_auth_status_file_path) == app_dir:
+                return HttpResponse("Error: Invalid asset_id", content_type="text/plain", status=400)
             open(auth_status_file_path, 'w').close()
             try:
                 uid = pwd.getpwnam('apache').pw_uid
