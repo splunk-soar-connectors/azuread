@@ -9,7 +9,7 @@
     "product_name": "Azure AD Graph",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019 Splunk Inc.",
+    "license": "Copyright (c) 2019-2020 Splunk Inc.",
     "app_version": "2.0.0",
     "python_version": "3",
     "utctime_updated": "2020-07-08T20:34:36.000000Z",
@@ -17,7 +17,7 @@
     "main_module": "azureadgraph_connector.py",
     "min_phantom_version": "4.8.24304",
     "latest_tested_versions": [
-        "Cloud 2020-07-08"
+        "Cloud 2020-07-08, API Version: 1.6"
     ],
     "app_wizard_version": "1.0.0",
     "rest_handler": "azureadgraph_connector._handle_rest_request",
@@ -77,7 +77,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -423,8 +424,7 @@
                     "data_path": "action_result.data.*.proxyAddresses",
                     "data_type": "string",
                     "example_values": [
-                        "SMTP:user1@test.onmicrosoft.com",
-                        "SMTP:user2@test.onmicrosoft.com"
+                        "SMTP:user1@test.onmicrosoft.com"
                     ]
                 },
                 {
@@ -610,7 +610,6 @@
                     "description": "Temporary password for user",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 2
                 }
             },
@@ -619,7 +618,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "column_name": "Status",
                     "column_order": 1
@@ -721,7 +721,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "column_name": "Status",
                     "column_order": 1
@@ -828,7 +829,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "column_name": "Status",
                     "column_order": 1
@@ -911,7 +913,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "column_name": "Status",
                     "column_order": 1
@@ -993,7 +996,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1018,8 +1022,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.ageGroup",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.assignedLicenses.*.skuId",
@@ -1058,23 +1061,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.city",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.companyName",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.consentProvidedForMinor",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.country",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.createdDateTime",
@@ -1085,13 +1084,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.creationType",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.deletionTimestamp",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.department",
@@ -1102,8 +1099,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.dirSyncEnabled",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.displayName",
@@ -1114,51 +1110,42 @@
                 },
                 {
                     "data_path": "action_result.data.*.employeeId",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.facsimileTelephoneNumber",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.givenName",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.immutableId",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.isCompromised",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.jobTitle",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.lastDirSyncTime",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.legalAgeGroupClassification",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.mail",
                     "data_type": "string",
                     "contains": [
                         "email"
-                    ],
-                    "example_values": []
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.mailNickname",
@@ -1169,8 +1156,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.mobile",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.objectId",
@@ -1195,13 +1181,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.onPremisesDistinguishedName",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.onPremisesSecurityIdentifier",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.otherMails",
@@ -1215,13 +1199,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.passwordPolicies",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.passwordProfile",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.passwordProfile.enforceChangePasswordPolicy",
@@ -1241,23 +1223,19 @@
                 },
                 {
                     "data_path": "action_result.data.*.passwordProfile.password",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.physicalDeliveryOfficeName",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.postalCode",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.preferredLanguage",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.provisionedPlans.*.capabilityStatus",
@@ -1296,36 +1274,30 @@
                 },
                 {
                     "data_path": "action_result.data.*.showInAddressList",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sipProxyAddress",
                     "data_type": "string",
                     "contains": [
                         "email"
-                    ],
-                    "example_values": []
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.state",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.streetAddress",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.surname",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.telephoneNumber",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.thumbnailPhoto@odata.mediaEditLink",
@@ -1353,13 +1325,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.userState",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.userStateChangedOn",
-                    "data_type": "string",
-                    "example_values": []
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.userType",
@@ -1450,7 +1420,6 @@
                     "description": "Value of attribute to set",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 3
                 }
             },
@@ -1459,7 +1428,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "column_name": "Status",
                     "column_order": 1
@@ -1566,7 +1536,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "column_name": "Status",
                     "column_order": 2
@@ -1671,7 +1642,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "column_name": "Status",
                     "column_order": 2
@@ -1752,7 +1724,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1927,7 +1900,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2121,7 +2095,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2224,7 +2199,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -2310,7 +2286,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
