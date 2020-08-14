@@ -637,7 +637,8 @@ class AzureADGraphConnector(BaseConnector):
         # Save the state, will be used by the request handler
         _save_app_state(app_state, self.get_asset_id(), self)
 
-        self.save_progress('Please connect to the following URL from a different tab to continue the connectivity process\n{0}'.format(url_to_show))
+        self.save_progress('Please connect to the following URL from a different tab to continue the connectivity process')
+        self.save_progress(url_to_show)
         self.save_progress(MS_AZURE_AUTHORIZE_TROUBLESHOOT_MSG)
 
         time.sleep(5)
