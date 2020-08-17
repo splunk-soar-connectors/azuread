@@ -17,13 +17,13 @@
     "main_module": "azureadgraph_connector.py",
     "min_phantom_version": "4.8.24304",
     "latest_tested_versions": [
-        "Cloud 2020-07-08, API Version: 1.6"
+        "Cloud 2020-08-17, API Version: 1.6"
     ],
     "app_wizard_version": "1.0.0",
     "rest_handler": "azureadgraph_connector._handle_rest_request",
     "configuration": {
         "tenant_id": {
-            "description": "Tenant (e.g. contoso.onmicrosoft.com)",
+            "description": "Tenant (Tenant ID Or Tenant Name)",
             "data_type": "string",
             "required": true,
             "order": 0
@@ -67,8 +67,6 @@
                 "filter_string": {
                     "description": "Filter string to apply to user listing",
                     "data_type": "string",
-                    "required": false,
-                    "primary": false,
                     "order": 0
                 }
             },
@@ -602,7 +600,6 @@
                 "force_change": {
                     "description": "Force user to change password on next login",
                     "data_type": "boolean",
-                    "required": false,
                     "default": true,
                     "order": 1
                 },
@@ -750,7 +747,7 @@
                     "data_path": "action_result.data.*.odata.metadata",
                     "data_type": "string",
                     "example_values": [
-                        "https://graph.windows.net/2e799abf-db6c-4fcb-a1d2-07bf1824d58d/$metadata#Edm.Null"
+                        "https://graph.windows.net/tenantID/$metadata#Edm.Null"
                     ],
                     "contains": [
                         "url"
@@ -981,7 +978,6 @@
                 "user_id": {
                     "description": "User ID - can be user principal name or object ID",
                     "data_type": "string",
-                    "required": false,
                     "primary": true,
                     "order": 0,
                     "contains": [
@@ -1171,6 +1167,11 @@
                     "example_values": [
                         "User"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.odata.metadata",
+                    "data_type": "string",
+                    "example_value": "https://graph.windows.net/tenantID/$metadata#directoryObjects/@Element"
                 },
                 {
                     "data_path": "action_result.data.*.odata.type",
@@ -1406,14 +1407,12 @@
                 "ph_0": {
                     "description": "Placeholder",
                     "data_type": "ph",
-                    "required": false,
                     "order": 1
                 },
                 "attribute": {
                     "description": "Attribute to set",
                     "data_type": "string",
                     "required": true,
-                    "primary": false,
                     "order": 2
                 },
                 "attribute_value": {
@@ -1992,7 +1991,7 @@
                     "data_path": "action_result.data.*.odata.metadata",
                     "data_type": "string",
                     "example_values": [
-                        "https://graph.windows.net/1e309abf-db6c-4fcb-a1d2-07bf6824d58d/$metadata#directoryObjects/@Element"
+                        "https://graph.windows.net/tenantID/$metadata#directoryObjects/@Element"
                     ]
                 },
                 {
@@ -2075,6 +2074,7 @@
         {
             "action": "list group members",
             "description": "List the members in a group",
+            "verbose": "<p>Pagination is not implemented for this action as this endpoint does not support pagination. Here is the <b><a href='https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options' target='_blank'>Documentation</a></b> for the same.</p>",
             "type": "investigate",
             "identifier": "list_group_members",
             "read_only": true,
@@ -2167,7 +2167,7 @@
         {
             "action": "validate group",
             "description": "Returns true if a user is in a group; otherwise, false",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "validate_group",
             "read_only": true,
             "parameters": {
@@ -2236,7 +2236,7 @@
                         true,
                         false
                     ],
-                    "column_name": "User in Group",
+                    "column_name": "User In Group",
                     "column_order": 2
                 },
                 {
@@ -2277,7 +2277,8 @@
         {
             "action": "list directory roles",
             "description": "List the directory roles in a tenant",
-            "type": "generic",
+            "verbose": "<p>Pagination is not implemented for this action as this endpoint does not support pagination. Here is the <b><a href='https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options' target='_blank'>Documentation</a></b> for the same.</p>",
+            "type": "investigate",
             "identifier": "list_directory_roles",
             "read_only": true,
             "parameters": {},

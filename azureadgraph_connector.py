@@ -270,9 +270,7 @@ class AzureADGraphConnector(BaseConnector):
     def _handle_py_ver_compat_for_input_str(self, input_str):
         """
         This method returns the encoded|original string based on the Python version.
-        :param python_version: Python major version
         :param input_str: Input string to be processed
-        :param app_connector: Object of app_connector class
         :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
         """
         try:
@@ -285,9 +283,7 @@ class AzureADGraphConnector(BaseConnector):
 
     def _get_error_message_from_exception(self, e):
         """ This function is used to get appropriate error message from the exception.
-        :param python_version: Python major version
         :param e: Exception object
-        :param app_connector: Object of app_connector class
         :return: error message
         """
         error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
@@ -392,7 +388,7 @@ class AzureADGraphConnector(BaseConnector):
             if resp_json.get('error', {}).get('message'):
                 error_message = self._handle_py_ver_compat_for_input_str(resp_json['error']['message'])
                 message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
-                                                                                        error_message)
+                                                                                             error_message)
         else:
             error_message = self._handle_py_ver_compat_for_input_str(resp_json['error'])
             message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
@@ -554,7 +550,7 @@ class AzureADGraphConnector(BaseConnector):
         """
 
         url = "{0}/{1}{2}".format(AZUREADGRAPH_API_URL, self._tenant, endpoint)
-        if (headers is None):
+        if headers is None:
             headers = {}
 
         token = self._state.get('token', {})
@@ -578,7 +574,7 @@ class AzureADGraphConnector(BaseConnector):
             self.save_progress("bad token")
             ret_val = self._get_token(action_result)
 
-            headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
+            headers.update({'Authorization': 'Bearer {0}'.format(self._access_token)})
 
             ret_val, resp_json = self._make_rest_call(url, action_result, verify, headers, params, data, json, method)
 
@@ -596,11 +592,11 @@ class AzureADGraphConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(param))
 
         self.save_progress("Getting App REST endpoint URL")
-        # Get the URL to the app's REST Endpiont, this is the url that the TC dialog
+        # Get the URL to the app's REST Endpoint, this is the url that the TC dialog
         # box will ask the user to connect to
         ret_val, app_rest_url = self._get_app_rest_url(action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress(MS_REST_URL_NOT_AVAILABLE_MSG.format(error=self.get_status()))
             return self.set_status(phantom.APP_ERROR)
 
@@ -654,14 +650,14 @@ class AzureADGraphConnector(BaseConnector):
 
             self.send_progress('{0}'.format('.' * (i % 10)))
 
-            if (os.path.isfile(auth_status_file_path)):
+            if os.path.isfile(auth_status_file_path):
                 completed = True
                 os.unlink(auth_status_file_path)
                 break
 
             time.sleep(MS_TC_STATUS_SLEEP)
 
-        if (not completed):
+        if not completed:
             self.save_progress("Authentication process does not seem to be completed. Timing out")
             return self.set_status(phantom.APP_ERROR)
 
@@ -675,27 +671,27 @@ class AzureADGraphConnector(BaseConnector):
             self.save_progress("Test Connectivity Failed")
             return self.set_status(phantom.APP_ERROR)
 
-        # The authentication seems to be done, let's see if it was successfull
+        # The authentication seems to be done, let's see if it was successful
         self._state['admin_consent'] = self._state.get('admin_consent', False)
 
         self.save_progress(MS_GENERATING_ACCESS_TOKEN_MSG)
         ret_val = self._get_token(action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         self.save_progress("Getting info about a single user to verify token")
         params = {'api-version': '1.6', '$top': '1'}
         ret_val, response = self._make_rest_call_helper(action_result, "/users", params=params)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("API to get users failed")
             self.save_progress("Test Connectivity Failed")
             return self.set_status(phantom.APP_ERROR)
 
         value = response.get('value')
 
-        if (value):
+        if value:
             self.save_progress("Got user info")
 
         self.save_progress("Test Connectivity Passed")
@@ -718,7 +714,7 @@ class AzureADGraphConnector(BaseConnector):
 
         ret_val = self._handle_pagination(action_result, endpoint, parameters=parameters)
 
-        if(phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
@@ -749,7 +745,7 @@ class AzureADGraphConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method='patch')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
@@ -773,7 +769,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/users/{}'.format(user_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method='patch')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -795,7 +791,7 @@ class AzureADGraphConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -820,7 +816,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/users/{}'.format(user_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method='patch')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -844,7 +840,7 @@ class AzureADGraphConnector(BaseConnector):
 
         ret_val = self._handle_pagination(action_result, endpoint, parameters=parameters)
 
-        if(phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
@@ -874,7 +870,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/users/{}'.format(user_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method='patch')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
@@ -902,7 +898,7 @@ class AzureADGraphConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method='post')
 
         summary = action_result.update_summary({})
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if 'references already exist for the following modified properties: \'members\'.' in message:
                 summary['status'] = "User already in group"
@@ -929,7 +925,7 @@ class AzureADGraphConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='delete')
 
         summary = action_result.update_summary({})
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if 'does not exist or one of its queried' in message:
                 summary['status'] = "User not in group"
@@ -950,7 +946,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/groups'
         ret_val = self._handle_pagination(action_result, endpoint, parameters=parameters)
 
-        if(phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
@@ -969,7 +965,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/groups/{}'.format(object_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -989,7 +985,7 @@ class AzureADGraphConnector(BaseConnector):
 
         user_id_map = dict()
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return ret_val, user_id_map
 
         if user:
@@ -1012,7 +1008,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/groups/{}/$links/members'.format(object_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # action_result.add_data(response)
@@ -1048,7 +1044,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/directoryRoles'
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         value = response.get('value', [])
@@ -1073,7 +1069,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/groups/{}/$links/members'.format(object_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # action_result.add_data(response)
@@ -1088,14 +1084,14 @@ class AzureADGraphConnector(BaseConnector):
 
         user_in_group = False
 
-        if (phantom.is_fail(user_id_map_ret_val)):
+        if phantom.is_fail(user_id_map_ret_val):
             return action_result.get_status()
         # Look for user in group
         for item in user_object_ids:
             if user_id_map.get(item):
                 user_in_group = True
 
-        action_result.add_data({ 'user_in_group': user_in_group })
+        action_result.add_data({'user_in_group': user_in_group})
         summary = action_result.update_summary({})
         summary['user_in_group'] = user_in_group
 
@@ -1130,7 +1126,7 @@ class AzureADGraphConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call(req_url, action_result, headers=headers, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         self._state[MS_AZURE_TOKEN_STRING] = resp_json
@@ -1138,14 +1134,14 @@ class AzureADGraphConnector(BaseConnector):
         self._refresh_token = resp_json[MS_AZURE_REFRESH_TOKEN_STRING]
         self.save_state(self._state)
 
-        return (phantom.APP_SUCCESS)
+        return phantom.APP_SUCCESS
 
     def _handle_pagination(self, action_result, endpoint, parameters=None):
         """
         This action is used to create an iterator that will paginate through responses from called methods.
 
-        :param method_name: Name of method whose response is to be paginated
         :param action_result: Object of ActionResult class
+        :param endpoint: REST endpoint that needs to appended to the service address
         :param **kwargs: Dictionary of Input parameters
         """
         # maximum page size
@@ -1273,7 +1269,7 @@ class AzureADGraphConnector(BaseConnector):
 
     def finalize(self):
 
-        # Save the state, this data is saved accross actions and app upgrades
+        # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         _save_app_state(self._state, self.get_asset_id(), self)
         return phantom.APP_SUCCESS
