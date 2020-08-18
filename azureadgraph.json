@@ -747,7 +747,7 @@
                     "data_path": "action_result.data.*.odata.metadata",
                     "data_type": "string",
                     "example_values": [
-                        "https://graph.windows.net/tenantID/$metadata#Edm.Null"
+                        "https://graph.windows.net/1t309est-db6c-4tes-t1d2-12bf3456d78d/$metadata#Edm.Null"
                     ],
                     "contains": [
                         "url"
@@ -1171,7 +1171,7 @@
                 {
                     "data_path": "action_result.data.*.odata.metadata",
                     "data_type": "string",
-                    "example_value": "https://graph.windows.net/tenantID/$metadata#directoryObjects/@Element"
+                    "example_value": "https://graph.windows.net/1t309est-db6c-4tes-t1d2-12bf3456d78d/$metadata#directoryObjects/@Element"
                 },
                 {
                     "data_path": "action_result.data.*.odata.type",
@@ -1991,7 +1991,7 @@
                     "data_path": "action_result.data.*.odata.metadata",
                     "data_type": "string",
                     "example_values": [
-                        "https://graph.windows.net/tenantID/$metadata#directoryObjects/@Element"
+                        "https://graph.windows.net/1t309est-db6c-4tes-t1d2-12bf3456d78d/$metadata#directoryObjects/@Element"
                     ]
                 },
                 {
