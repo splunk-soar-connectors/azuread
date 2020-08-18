@@ -23,7 +23,7 @@
     "rest_handler": "azureadgraph_connector._handle_rest_request",
     "configuration": {
         "tenant_id": {
-            "description": "Tenant (Tenant ID Or Tenant Name)",
+            "description": "Tenant (Tenant ID or Tenant Name)",
             "data_type": "string",
             "required": true,
             "order": 0
@@ -1713,7 +1713,7 @@
         },
         {
             "action": "list groups",
-            "description": "List groups in organization",
+            "description": "List groups in the organization",
             "type": "investigate",
             "identifier": "list_groups",
             "read_only": true,
