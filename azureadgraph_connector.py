@@ -1,5 +1,5 @@
 # File: azureadgraph_connector.py
-# Copyright (c) 2019 Splunk Inc.
+# Copyright (c) 2019-2020 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -14,17 +14,23 @@ from phantom.action_result import ActionResult
 # from datetime import datetime, timedelta
 from django.http import HttpResponse
 from azureadgraph_consts import *
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, UnicodeDammit
 
 import requests
 # import random
 # import base64
+import sys
 import json
 import time
 import pwd
 import grp
 import os
 import re
+try:
+    import urllib.parse as urlparse
+except ImportError:
+    import urlparse
+    import urllib
 
 TC_FILE = "oauth_task.out"
 SERVER_TOKEN_URL = "https://login.microsoftonline.com/{0}/oauth2/token"
@@ -44,11 +50,13 @@ def _handle_login_redirect(request, key):
 
     asset_id = request.GET.get('asset_id')
     if not asset_id:
-        return HttpResponse('ERROR: Asset ID not found in URL')
+        return HttpResponse('ERROR: Asset ID not found in URL', content_type="text/plain", status=400)
     state = _load_app_state(asset_id)
+    if not state:
+        return HttpResponse('ERROR: Invalid asset_id', content_type="text/plain", status=400)
     url = state.get(key)
     if not url:
-        return HttpResponse('App state is invalid, {key} not found.'.format(key=key))
+        return HttpResponse('App state is invalid, {key} not found.'.format(key=key), content_type="text/plain", status=400)
     response = HttpResponse(status=302)
     response['Location'] = url
     return response
@@ -62,11 +70,23 @@ def _load_app_state(asset_id, app_connector=None):
     :return: state: Current state file as a dictionary
     """
 
-    dirpath = os.path.split(__file__)[0]
-    state_file = '{0}/{1}_state.json'.format(dirpath, asset_id)
+    asset_id = str(asset_id)
+    if not asset_id or not asset_id.isalnum():
+        if app_connector:
+            app_connector.debug_print('In _load_app_state: Invalid asset_id')
+        return {}
+
+    app_dir = os.path.dirname(os.path.abspath(__file__))
+    state_file = '{0}/{1}_state.json'.format(app_dir, asset_id)
+    real_state_file_path = os.path.realpath(state_file)
+    if not os.path.dirname(real_state_file_path) == app_dir:
+        if app_connector:
+            app_connector.debug_print('In _load_app_state: Invalid asset_id')
+        return {}
+
     state = {}
     try:
-        with open(state_file, 'r') as state_file_obj:
+        with open(real_state_file_path, 'r') as state_file_obj:
             state_file_data = state_file_obj.read()
             state = json.loads(state_file_data)
     except Exception as e:
@@ -75,11 +95,12 @@ def _load_app_state(asset_id, app_connector=None):
 
     if app_connector:
         app_connector.debug_print('Loaded state: ', state)
+
     return state
 
 
 def _save_app_state(state, asset_id, app_connector):
-    """ This functions is used to save current state in file.
+    """ This function is used to save current state in file.
 
     :param state: Dictionary which contains data to write in state file
     :param asset_id: asset_id
@@ -87,17 +108,29 @@ def _save_app_state(state, asset_id, app_connector):
     :return: status: phantom.APP_SUCCESS
     """
 
-    dirpath = os.path.split(__file__)[0]
-    state_file = '{0}/{1}_state.json'.format(dirpath, asset_id)
+    asset_id = str(asset_id)
+    if not asset_id or not asset_id.isalnum():
+        if app_connector:
+            app_connector.debug_print('In _save_app_state: Invalid asset_id')
+        return {}
+
+    app_dir = os.path.split(__file__)[0]
+    state_file = '{0}/{1}_state.json'.format(app_dir, asset_id)
+
+    real_state_file_path = os.path.realpath(state_file)
+    if not os.path.dirname(real_state_file_path) == app_dir:
+        if app_connector:
+            app_connector.debug_print('In _save_app_state: Invalid asset_id')
+        return {}
 
     if app_connector:
         app_connector.debug_print('Saving state: ', state)
 
     try:
-        with open(state_file, 'w+') as state_file_obj:
+        with open(real_state_file_path, 'w+') as state_file_obj:
             state_file_obj.write(json.dumps(state))
     except Exception as e:
-        print 'Unable to save state file: {0}'.format(str(e))
+        print('Unable to save state file: {0}'.format(str(e)))
 
     return phantom.APP_SUCCESS
 
@@ -111,7 +144,7 @@ def _handle_login_response(request):
 
     asset_id = request.GET.get('state')
     if not asset_id:
-        return HttpResponse('ERROR: Asset ID not found in URL\n{}'.format(json.dumps(request.GET)))
+        return HttpResponse('ERROR: Asset ID not found in URL\n{}'.format(json.dumps(request.GET)), content_type="text/plain", status=400)
 
     # Check for error in URL
     error = request.GET.get('error')
@@ -122,14 +155,14 @@ def _handle_login_response(request):
         message = 'Error: {0}'.format(error)
         if error_description:
             message = '{0} Details: {1}'.format(message, error_description)
-        return HttpResponse('Server returned {0}'.format(message))
+        return HttpResponse('Server returned {0}'.format(message), content_type="text/plain", status=400)
 
     code = request.GET.get('code')
     admin_consent = request.GET.get('admin_consent')
 
     # If none of the code or admin_consent is available
     if not (code or admin_consent):
-        return HttpResponse('Error while authenticating\n{0}'.format(json.dumps(request.GET)))
+        return HttpResponse('Error while authenticating\n{0}'.format(json.dumps(request.GET)), content_type="text/plain", status=400)
 
     state = _load_app_state(asset_id)
 
@@ -145,14 +178,14 @@ def _handle_login_response(request):
 
         # If admin_consent is True
         if admin_consent:
-            return HttpResponse('Admin Consent received. Please close this window.')
-        return HttpResponse('Admin Consent declined. Please close this window and try again later.')
+            return HttpResponse('Admin Consent received. Please close this window.', content_type="text/plain")
+        return HttpResponse('Admin Consent declined. Please close this window and try again later.', content_type="text/plain", status=400)
 
     # If value of admin_consent is not available, value of code is available
     state['code'] = code
     _save_app_state(state, asset_id, None)
 
-    return HttpResponse('Code received. Please close this window, the action will continue to get new token.')
+    return HttpResponse('Code received. Please close this window, the action will continue to get new token.', content_type="text/plain")
 
 
 def _handle_rest_request(request, path_parts):
@@ -164,7 +197,7 @@ def _handle_rest_request(request, path_parts):
     """
 
     if len(path_parts) < 2:
-        return HttpResponse('error: True, message: Invalid REST endpoint request')
+        return HttpResponse('error: True, message: Invalid REST endpoint request', content_type="text/plain", status=400)
 
     call_type = path_parts[1]
 
@@ -180,9 +213,12 @@ def _handle_rest_request(request, path_parts):
     if call_type == 'result':
         return_val = _handle_login_response(request)
         asset_id = request.GET.get('state')
-        if asset_id:
+        if asset_id and asset_id.isalnum():
             app_dir = os.path.dirname(os.path.abspath(__file__))
             auth_status_file_path = '{0}/{1}_{2}'.format(app_dir, asset_id, TC_FILE)
+            real_auth_status_file_path = os.path.realpath(auth_status_file_path)
+            if not os.path.dirname(real_auth_status_file_path) == app_dir:
+                return HttpResponse("Error: Invalid asset_id", content_type="text/plain", status=400)
             open(auth_status_file_path, 'w').close()
             try:
                 uid = pwd.getpwnam('apache').pw_uid
@@ -193,7 +229,7 @@ def _handle_rest_request(request, path_parts):
                 pass
 
         return return_val
-    return HttpResponse('error: Invalid endpoint')
+    return HttpResponse('error: Invalid endpoint', content_type="text/plain", status=404)
 
 
 def _get_dir_name_from_app_name(app_name):
@@ -231,6 +267,51 @@ class AzureADGraphConnector(BaseConnector):
         self._access_token = None
         self._refresh_token = None
 
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+        try:
+            if input_str and self._python_version < 3:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
+    def _get_error_message_from_exception(self, e):
+        """ This function is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+        error_code = "Error code unavailable"
+        try:
+            if e.args:
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_code = "Error code unavailable"
+                    error_msg = e.args[0]
+            else:
+                error_code = "Error code unavailable"
+                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+        except:
+            error_code = "Error code unavailable"
+            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+
+        try:
+            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
+        except TypeError:
+            error_msg = "Error occurred while connecting to the Microsoft Teams server. Please check the asset configuration and|or the action parameters."
+        except:
+            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
 
@@ -258,7 +339,10 @@ class AzureADGraphConnector(BaseConnector):
 
         try:
             soup = BeautifulSoup(response.text, "html.parser")
-            error_text = soup.text.encode('utf-8')
+            # Remove the script, style, footer and navigation part from the HTML message
+            for element in soup(["script", "style", "footer", "nav"]):
+                element.extract()
+            error_text = soup.text
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
@@ -268,7 +352,7 @@ class AzureADGraphConnector(BaseConnector):
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
                                                                       error_text)
 
-        message = message.replace('{', '{{').replace('}', '}}')
+        message = self._handle_py_ver_compat_for_input_str(message.replace('{', '{{').replace('}', '}}'))
 
         if status_code == 400:
             message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, MS_AZURE_HTML_ERROR)
@@ -287,25 +371,28 @@ class AzureADGraphConnector(BaseConnector):
         try:
             resp_json = response.json()
         except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Unable to parse JSON response. Error: {0}".
-                                                   format(str(e))), None)
+                                                   format(error_message)), None)
 
         # Please specify the status codes here
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
+        error_message = self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}'))
         message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
-                                                                                     response.text.replace('{', '{{')
-                                                                                     .replace('}', '}}').encode('utf-8'))
+                                                                                     error_message)
 
         # Show only error message if available
         if isinstance(resp_json.get('error', {}), dict):
             if resp_json.get('error', {}).get('message'):
+                error_message = self._handle_py_ver_compat_for_input_str(resp_json['error']['message'])
                 message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
-                                                                                         resp_json['error']['message'].encode('utf-8'))
+                                                                                             error_message)
         else:
+            error_message = self._handle_py_ver_compat_for_input_str(resp_json['error'])
             message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
-                                                                                         resp_json['error'].encode('utf-8'))
+                                                                                         error_message)
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -349,7 +436,7 @@ class AzureADGraphConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-            response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
+            response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -386,7 +473,7 @@ class AzureADGraphConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return ret_val, None
 
-        phantom_base_url = resp_json.get('base_url')
+        phantom_base_url = resp_json.get('base_url').rstrip("/")
         if not phantom_base_url:
             return action_result.set_status(phantom.APP_ERROR, MS_AZURE_BASE_URL_NOT_FOUND_MSG), None
         return phantom.APP_SUCCESS, phantom_base_url
@@ -441,8 +528,9 @@ class AzureADGraphConnector(BaseConnector):
         try:
             r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, params=params)
         except Exception as e:
+            error_message = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, "Error Connecting to server. Details: {0}"
-                                                   .format(str(e))), resp_json)
+                                                   .format(error_message)), resp_json)
 
         return self._process_response(r, action_result)
 
@@ -462,7 +550,7 @@ class AzureADGraphConnector(BaseConnector):
         """
 
         url = "{0}/{1}{2}".format(AZUREADGRAPH_API_URL, self._tenant, endpoint)
-        if (headers is None):
+        if headers is None:
             headers = {}
 
         token = self._state.get('token', {})
@@ -486,7 +574,7 @@ class AzureADGraphConnector(BaseConnector):
             self.save_progress("bad token")
             ret_val = self._get_token(action_result)
 
-            headers.update({ 'Authorization': 'Bearer {0}'.format(self._access_token)})
+            headers.update({'Authorization': 'Bearer {0}'.format(self._access_token)})
 
             ret_val, resp_json = self._make_rest_call(url, action_result, verify, headers, params, data, json, method)
 
@@ -504,11 +592,11 @@ class AzureADGraphConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(param))
 
         self.save_progress("Getting App REST endpoint URL")
-        # Get the URL to the app's REST Endpiont, this is the url that the TC dialog
+        # Get the URL to the app's REST Endpoint, this is the url that the TC dialog
         # box will ask the user to connect to
         ret_val, app_rest_url = self._get_app_rest_url(action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress(MS_REST_URL_NOT_AVAILABLE_MSG.format(error=self.get_status()))
             return self.set_status(phantom.APP_ERROR)
 
@@ -520,6 +608,13 @@ class AzureADGraphConnector(BaseConnector):
 
         self.save_progress(MS_OAUTH_URL_MSG)
         self.save_progress(redirect_uri)
+
+        if self._python_version < 3:
+            self._client_id = urllib.quote(self._client_id)
+            self._tenant = urllib.quote(self._tenant)
+        else:
+            self._client_id = urlparse.quote(self._client_id)
+            self._tenant = urlparse.quote(self._tenant)
 
         admin_consent_url = "https://login.microsoftonline.com/{0}/oauth2/authorize".format(self._tenant)
         admin_consent_url += "?client_id={0}".format(self._client_id)
@@ -538,7 +633,9 @@ class AzureADGraphConnector(BaseConnector):
         # Save the state, will be used by the request handler
         _save_app_state(app_state, self.get_asset_id(), self)
 
-        self.save_progress('Please connect to the following URL from a different tab to continue the connectivity process\n{0}'.format(url_to_show))
+        self.save_progress('Please connect to the following URL from a different tab to continue the connectivity process')
+        self.save_progress(url_to_show)
+        self.save_progress(MS_AZURE_AUTHORIZE_TROUBLESHOOT_MSG)
 
         time.sleep(5)
 
@@ -553,14 +650,14 @@ class AzureADGraphConnector(BaseConnector):
 
             self.send_progress('{0}'.format('.' * (i % 10)))
 
-            if (os.path.isfile(auth_status_file_path)):
+            if os.path.isfile(auth_status_file_path):
                 completed = True
                 os.unlink(auth_status_file_path)
                 break
 
             time.sleep(MS_TC_STATUS_SLEEP)
 
-        if (not completed):
+        if not completed:
             self.save_progress("Authentication process does not seem to be completed. Timing out")
             return self.set_status(phantom.APP_ERROR)
 
@@ -574,27 +671,27 @@ class AzureADGraphConnector(BaseConnector):
             self.save_progress("Test Connectivity Failed")
             return self.set_status(phantom.APP_ERROR)
 
-        # The authentication seems to be done, let's see if it was successfull
+        # The authentication seems to be done, let's see if it was successful
         self._state['admin_consent'] = self._state.get('admin_consent', False)
 
         self.save_progress(MS_GENERATING_ACCESS_TOKEN_MSG)
         ret_val = self._get_token(action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         self.save_progress("Getting info about a single user to verify token")
         params = {'api-version': '1.6', '$top': '1'}
         ret_val, response = self._make_rest_call_helper(action_result, "/users", params=params)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("API to get users failed")
             self.save_progress("Test Connectivity Failed")
             return self.set_status(phantom.APP_ERROR)
 
         value = response.get('value')
 
-        if (value):
+        if value:
             self.save_progress("Got user info")
 
         self.save_progress("Test Connectivity Passed")
@@ -615,17 +712,13 @@ class AzureADGraphConnector(BaseConnector):
 
         endpoint = '/users'
 
-        ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
+        ret_val = self._handle_pagination(action_result, endpoint, parameters=parameters)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        value = response.get('value', [])
-        for item in value:
-            action_result.add_data(item)
-
         summary = action_result.update_summary({})
-        summary['num_users'] = len(value)
+        summary['num_users'] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -634,8 +727,8 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = param['user_id']
-        temp_password = param.get('temp_password', '')
+        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
+        temp_password = self._handle_py_ver_compat_for_input_str(param.get('temp_password', ''))
         force_change = param.get('force_change', True)
 
         parameters = {'api-version': '1.6'}
@@ -652,7 +745,7 @@ class AzureADGraphConnector(BaseConnector):
 
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method='patch')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
@@ -666,7 +759,7 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = param['user_id']
+        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
         parameters = {'api-version': '1.6'}
 
         data = {
@@ -676,7 +769,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/users/{}'.format(user_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method='patch')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -692,13 +785,13 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = param['user_id']
+        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
         parameters = {'api-version': '1.6'}
         endpoint = '/users/{0}/invalidateAllRefreshTokens'.format(user_id)
 
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -713,7 +806,7 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = param['user_id']
+        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
         parameters = {'api-version': '1.6'}
 
         data = {
@@ -723,7 +816,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/users/{}'.format(user_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method='patch')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -738,27 +831,24 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = param.get('user_id')
+        user_id = self._handle_py_ver_compat_for_input_str(param.get('user_id'))
         parameters = {'api-version': '1.6'}
-
         if user_id:
             endpoint = '/users/{}'.format(user_id)
         else:
             endpoint = '/users'
-        ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
 
-        if (phantom.is_fail(ret_val)):
+        ret_val = self._handle_pagination(action_result, endpoint, parameters=parameters)
+
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
         if user_id:
-            action_result.add_data(response)
             summary['status'] = "Successfully retrieved attributes for user {}".format(user_id)
+            response = action_result.get_data()[0]
             summary['user_enabled'] = response.get('accountEnabled')
         else:
-            value = response.get('value', [])
-            for item in value:
-                action_result.add_data(item)
             summary['status'] = "Successfully retrieved user attributes"
 
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -768,9 +858,9 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = param['user_id']
-        attribute = param['attribute']
-        attribute_value = param['attribute_value']
+        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
+        attribute = self._handle_py_ver_compat_for_input_str(param['attribute'])
+        attribute_value = self._handle_py_ver_compat_for_input_str(param['attribute_value'])
         parameters = {'api-version': '1.6'}
 
         data = {
@@ -780,7 +870,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/users/{}'.format(user_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method='patch')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
@@ -793,8 +883,8 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = param['group_object_id']
-        user_id = param['user_id']
+        object_id = self._handle_py_ver_compat_for_input_str(param['group_object_id'])
+        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
 
         parameters = {
             'api-version': '1.6'
@@ -808,7 +898,7 @@ class AzureADGraphConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method='post')
 
         summary = action_result.update_summary({})
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if 'references already exist for the following modified properties: \'members\'.' in message:
                 summary['status'] = "User already in group"
@@ -824,8 +914,8 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = param['group_object_id']
-        user_id = param['user_id']
+        object_id = self._handle_py_ver_compat_for_input_str(param['group_object_id'])
+        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
 
         parameters = {
             'api-version': '1.6'
@@ -835,7 +925,7 @@ class AzureADGraphConnector(BaseConnector):
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='delete')
 
         summary = action_result.update_summary({})
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if 'does not exist or one of its queried' in message:
                 summary['status'] = "User not in group"
@@ -854,17 +944,13 @@ class AzureADGraphConnector(BaseConnector):
         parameters = {'api-version': '1.6'}
 
         endpoint = '/groups'
-        ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
+        ret_val = self._handle_pagination(action_result, endpoint, parameters=parameters)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        value = response.get('value', [])
-        for item in value:
-            action_result.add_data(item)
-
         summary = action_result.update_summary({})
-        summary['num_groups'] = len(value)
+        summary['num_groups'] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -873,13 +959,13 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = param['object_id']
+        object_id = self._handle_py_ver_compat_for_input_str(param['object_id'])
         parameters = {'api-version': '1.6'}
 
         endpoint = '/groups/{}'.format(object_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         action_result.add_data(response)
@@ -899,7 +985,7 @@ class AzureADGraphConnector(BaseConnector):
 
         user_id_map = dict()
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return ret_val, user_id_map
 
         if user:
@@ -915,14 +1001,14 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = param['group_object_id']
+        object_id = self._handle_py_ver_compat_for_input_str(param['group_object_id'])
         parameters = {'api-version': '1.6'}
 
         # Returns a list of group members' directory object URLs
         endpoint = '/groups/{}/$links/members'.format(object_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # action_result.add_data(response)
@@ -958,7 +1044,7 @@ class AzureADGraphConnector(BaseConnector):
         endpoint = '/directoryRoles'
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         value = response.get('value', [])
@@ -975,15 +1061,15 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = param['group_object_id']
-        user_id = param['user_id']
+        object_id = self._handle_py_ver_compat_for_input_str(param['group_object_id'])
+        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
         parameters = {'api-version': '1.6'}
 
         # Returns a list of group members' directory object URLs
         endpoint = '/groups/{}/$links/members'.format(object_id)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # action_result.add_data(response)
@@ -998,13 +1084,14 @@ class AzureADGraphConnector(BaseConnector):
 
         user_in_group = False
 
-        if (not phantom.is_fail(ret_val)):
-            # Look for user in group
-            for item in user_object_ids:
-                if user_id_map.get(item):
-                    user_in_group = True
+        if phantom.is_fail(user_id_map_ret_val):
+            return action_result.get_status()
+        # Look for user in group
+        for item in user_object_ids:
+            if user_id_map.get(item):
+                user_in_group = True
 
-        action_result.add_data({ 'user_in_group': user_in_group })
+        action_result.add_data({'user_in_group': user_in_group})
         summary = action_result.update_summary({})
         summary['user_in_group'] = user_in_group
 
@@ -1039,7 +1126,7 @@ class AzureADGraphConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call(req_url, action_result, headers=headers, data=data, method='post')
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         self._state[MS_AZURE_TOKEN_STRING] = resp_json
@@ -1047,7 +1134,49 @@ class AzureADGraphConnector(BaseConnector):
         self._refresh_token = resp_json[MS_AZURE_REFRESH_TOKEN_STRING]
         self.save_state(self._state)
 
-        return (phantom.APP_SUCCESS)
+        return phantom.APP_SUCCESS
+
+    def _handle_pagination(self, action_result, endpoint, parameters=None):
+        """
+        This action is used to create an iterator that will paginate through responses from called methods.
+
+        :param action_result: Object of ActionResult class
+        :param endpoint: REST endpoint that needs to appended to the service address
+        :param **kwargs: Dictionary of Input parameters
+        """
+        # maximum page size
+        page_size = MS_AZURE_PAGE_SIZE
+        if isinstance(parameters, dict):
+            parameters.update({"$top": page_size})
+        else:
+            parameters = {"$top": page_size}
+
+        while True:
+
+            # make rest call
+            ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method='get')
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            if "value" in response:
+                for user in response.get('value', []):
+                    action_result.add_data(user)
+            else:
+                action_result.add_data(response)
+
+            if response.get(MS_AZURE_NEXT_LINK_STRING):
+                parsed_url = urlparse.urlparse(response.get(MS_AZURE_NEXT_LINK_STRING))
+                try:
+                    parameters['$skiptoken'] = urlparse.parse_qs(parsed_url.query).get('$skiptoken')[0]
+                except:
+                    self.debug_print("odata.nextLink is {0}".format(response.get(MS_AZURE_NEXT_LINK_STRING)))
+                    self.debug_print("Error occurred while extracting skiptoken from the odata.nextLink")
+                    break
+            else:
+                break
+
+        return phantom.APP_SUCCESS
 
     def handle_action(self, param):
 
@@ -1121,12 +1250,18 @@ class AzureADGraphConnector(BaseConnector):
 
         self._state = self.load_state()
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
         # get the asset config
         config = self.get_config()
 
-        self._tenant = config[MS_AZURE_CONFIG_TENANT].encode('utf-8')
-        self._client_id = config[MS_AZURE_CONFIG_CLIENT_ID].encode('utf-8')
-        self._client_secret = config[MS_AZURE_CONFIG_CLIENT_SECRET].encode('utf-8')
+        self._tenant = self._handle_py_ver_compat_for_input_str(config[MS_AZURE_CONFIG_TENANT])
+        self._client_id = self._handle_py_ver_compat_for_input_str(config[MS_AZURE_CONFIG_CLIENT_ID])
+        self._client_secret = config[MS_AZURE_CONFIG_CLIENT_SECRET]
         self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING)
 
@@ -1134,7 +1269,7 @@ class AzureADGraphConnector(BaseConnector):
 
     def finalize(self):
 
-        # Save the state, this data is saved accross actions and app upgrades
+        # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)
         _save_app_state(self._state, self.get_asset_id(), self)
         return phantom.APP_SUCCESS
@@ -1168,7 +1303,7 @@ if __name__ == '__main__':
     if (username and password):
         login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1181,11 +1316,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = login_url
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platform. Error: " + str(e))
+            print("Unable to get session id from the platform. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1201,6 +1336,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
