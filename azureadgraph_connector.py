@@ -130,7 +130,8 @@ def _save_app_state(state, asset_id, app_connector):
         with open(real_state_file_path, 'w+') as state_file_obj:
             state_file_obj.write(json.dumps(state))
     except Exception as e:
-        print('Unable to save state file: {0}'.format(str(e)))
+        if app_connector:
+            app_connector.debug_print('Unable to save state file: {0}'.format(str(e)))
 
     return phantom.APP_SUCCESS
 
