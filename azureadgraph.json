@@ -10,9 +10,9 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2020 Splunk Inc.",
-    "app_version": "2.0.2",
+    "app_version": "2.0.12",
     "python_version": "3",
-    "utctime_updated": "2020-09-01T13:39:05.000000Z",
+    "utctime_updated": "2020-12-10T05:52:01.000000Z",
     "package_name": "phantom_azureadgraph",
     "main_module": "azureadgraph_connector.py",
     "min_phantom_version": "4.8.24304",
@@ -96,10 +96,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.ageGroup",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.assignedLicenses.*.skuId",
@@ -145,17 +142,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.companyName",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.consentProvidedForMinor",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.country",
@@ -173,17 +164,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.creationType",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.deletionTimestamp",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.department",
@@ -194,10 +179,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.dirSyncEnabled",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.displayName",
@@ -210,17 +192,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.employeeId",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.facsimileTelephoneNumber",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.givenName",
@@ -231,17 +207,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.immutableId",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.isCompromised",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.jobTitle",
@@ -252,17 +222,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.lastDirSyncTime",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.legalAgeGroupClassification",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.mail",
@@ -316,17 +280,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.onPremisesDistinguishedName",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.onPremisesSecurityIdentifier",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.otherMails",
@@ -348,10 +306,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.passwordProfile",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.passwordProfile.enforceChangePasswordPolicy",
@@ -371,17 +326,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.passwordProfile.password",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.physicalDeliveryOfficeName",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.postalCode",
@@ -435,10 +384,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.showInAddressList",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.sipProxyAddress",
@@ -473,10 +419,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.telephoneNumber",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.thumbnailPhoto@odata.mediaEditLink",
@@ -507,17 +450,11 @@
                 },
                 {
                     "data_path": "action_result.data.*.userState",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.userStateChangedOn",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.userType",
@@ -773,7 +710,6 @@
                     "data_type": "string",
                     "example_values": [
                         "Successfully invalidated tokens",
-                        "",
                         "Status: Successfully disabled tokens"
                     ]
                 },
