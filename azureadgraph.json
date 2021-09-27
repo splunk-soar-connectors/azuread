@@ -15,7 +15,7 @@
     "utctime_updated": "2021-05-03T23:41:39.000000Z",
     "package_name": "phantom_azureadgraph",
     "main_module": "azureadgraph_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "latest_tested_versions": [
         "Cloud 2020-08-17, API Version: 1.6"
     ],
