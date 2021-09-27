@@ -116,7 +116,7 @@ def _save_app_state(state, asset_id, app_connector):
 
     app_dir = os.path.split(__file__)[0]
     state_file = '{0}/{1}_state.json'.format(app_dir, asset_id)
-    
+
     real_state_file_path = os.path.abspath(state_file)
     if not os.path.dirname(real_state_file_path) == app_dir:
         if app_connector:
