@@ -116,7 +116,7 @@ def _save_app_state(state, asset_id, app_connector):
 
     app_dir = os.path.split(__file__)[0]
     state_file = '{0}/{1}_state.json'.format(app_dir, asset_id)
-    
+
     real_state_file_path = os.path.abspath(state_file)
     if not os.path.dirname(real_state_file_path) == app_dir:
         if app_connector:
@@ -583,6 +583,17 @@ class AzureADGraphConnector(BaseConnector):
             return action_result.get_status(), None
 
         return phantom.APP_SUCCESS, resp_json
+
+    def _handle_generate_token(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        ret_val = self._get_token(action_result)
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        self._state['admin_consent'] = True
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Token generated")
 
     def _handle_test_connectivity(self, param):
         """ Function that handles the test connectivity action, it is much simpler than other action handlers."""
@@ -1238,6 +1249,9 @@ class AzureADGraphConnector(BaseConnector):
 
         elif action_id == 'list_policies':
             ret_val = self._handle_list_policies(param)
+
+        elif action_id == 'generate_token':
+            ret_val = self._handle_generate_token(param)
 
         return ret_val
 
