@@ -10,14 +10,14 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "2.0.15",
+    "app_version": "2.1.0",
     "python_version": "3",
     "utctime_updated": "2021-05-18T00:53:41.000000Z",
     "package_name": "phantom_azureadgraph",
     "main_module": "azureadgraph_connector.py",
-    "min_phantom_version": "4.9.39220",
+    "min_phantom_version": "4.10.0.40961",
     "latest_tested_versions": [
-        "Cloud 2020-08-17, API Version: 1.6"
+        "Cloud 2021-10-18, API Version: 1.6"
     ],
     "app_wizard_version": "1.0.0",
     "rest_handler": "azureadgraph_connector._handle_rest_request",
@@ -2314,6 +2314,61 @@
                     "example_values": [
                         "Num directory roles: 9"
                     ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "generate token",
+            "identifier": "generate_token",
+            "description": "Generate a token or regenerates token when the token expires",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {},
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Token generated"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 1
                 },
                 {
                     "data_path": "summary.total_objects",
