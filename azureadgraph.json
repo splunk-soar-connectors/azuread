@@ -16,6 +16,7 @@
     "package_name": "phantom_azureadgraph",
     "main_module": "azureadgraph_connector.py",
     "min_phantom_version": "4.10.0.40961",
+    "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud 2021-10-18, API Version: 1.6"
     ],
