@@ -9,15 +9,15 @@
     "product_name": "Azure AD Graph",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2021 Splunk Inc.",
-    "app_version": "2.1.6",
+    "license": "Copyright (c) 2019-2022 Splunk Inc.",
+    "app_version": "2.2.0",
     "python_version": "3",
     "utctime_updated": "2021-10-25T11:46:51.000000Z",
     "package_name": "phantom_azureadgraph",
     "main_module": "azureadgraph_connector.py",
-    "min_phantom_version": "4.10.0.40961",
+    "min_phantom_version": "5.0.0",
     "latest_tested_versions": [
-        "Cloud 2021-10-18, API Version: 1.6"
+        "Cloud 2022-01-10, API Version: 1.6"
     ],
     "app_wizard_version": "1.0.0",
     "rest_handler": "azureadgraph_connector._handle_rest_request",
@@ -43,6 +43,18 @@
             "data_type": "password",
             "required": true,
             "order": 3
+        },
+        "region": {
+            "data_type": "string",
+            "description": "Azure AD Region",
+            "default": "Global",
+            "order": 4,
+            "value_list": [
+                "Global",
+                "US Gov",
+                "Germany",
+                "China (21Vianet)"
+            ]
         }
     },
     "actions": [
@@ -692,6 +704,14 @@
                 },
                 {
                     "data_path": "action_result.data.*.odata.null",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.value",
                     "data_type": "boolean",
                     "example_values": [
                         true,

@@ -1,5 +1,5 @@
 [comment]: # " File: readme.md"
-[comment]: # "  Copyright (c) 2019-2021 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
 [comment]: # "you may not use this file except in compliance with the License."
@@ -44,17 +44,17 @@ After making these changes, click on **Grant admin consent** .
 When creating an asset for the **Azure AD Graph** app, place the **Application ID** of the app
 created during the previous step in the **Client ID** field and place the password generated during
 the app creation process in the **Client Secret** field. Then, after filling out the **Tenant**
-field, click **SAVE** .  
-  
+field, click **SAVE** .
+
 After saving, a new field will appear in the **Asset Settings** tab. Take the URL found in the
 **POST incoming for Azure AD Graph to this location** field and place it in the **Redirect URIs**
 field mentioned in a previous step. To this URL, add **/result** . After doing so the URL should
-look something like:  
-  
+look something like:
+
 
 https://\<phantom_host>/rest/handler/azureadgraph_c6d3b801-5c26-4abd-9e89-6d8007e2778f/\<asset_name>/result
 
-  
+
 Once again, click on Save.
 
 ## User Permissions
@@ -79,8 +79,8 @@ After setting up the asset and user, click the **TEST CONNECTIVITY** button. A w
 and display a URL. Navigate to this URL in a separate browser tab. This new tab will redirect to a
 Microsoft login page. Log in to a Microsoft account with administrator privileges to the Azure AD
 environment. After logging in, review the requested permissions listed, then click **Accept** .
-Finally, close that tab. The test connectivity window should show a success.  
-  
+Finally, close that tab. The test connectivity window should show a success.
+
 The app should now be ready to use.
 
 ## State File Permissions

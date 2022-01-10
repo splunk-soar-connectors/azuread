@@ -1,6 +1,6 @@
 # File: azureadgraph_connector.py
 #
-# Copyright (c) 2019-2021 Splunk Inc.
+# Copyright (c) 2019-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,31 +15,35 @@
 #
 #
 # Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-# from phantom.vault import Vault
-
-# from datetime import datetime, timedelta
-from django.http import HttpResponse
-from azureadgraph_consts import *
-from bs4 import BeautifulSoup, UnicodeDammit
-
-import requests
+import grp
+import json
+import os
+import pwd
+import re
 # import random
 # import base64
 import sys
-import json
 import time
-import pwd
-import grp
-import os
-import re
+
+import phantom.app as phantom
+import requests
+from bs4 import BeautifulSoup, UnicodeDammit
+# from datetime import datetime, timedelta
+from django.http import HttpResponse
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+
+from azureadgraph_consts import *
+
+# from phantom.vault import Vault
+
+
 try:
     import urllib.parse as urlparse
 except ImportError:
-    import urlparse
     import urllib
+
+    import urlparse
 
 TC_FILE = "oauth_task.out"
 SERVER_TOKEN_URL = "https://login.microsoftonline.com/{0}/oauth2/token"
@@ -276,6 +280,7 @@ class AzureADGraphConnector(BaseConnector):
         self._client_secret = None
         self._access_token = None
         self._refresh_token = None
+        self._base_url = None
 
     def _handle_py_ver_compat_for_input_str(self, input_str):
         """
@@ -316,7 +321,8 @@ class AzureADGraphConnector(BaseConnector):
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the Microsoft Teams server. Please check the asset configuration and|or the action parameters."
+            error_msg = "Error occurred while connecting to the Microsoft Teams server."\
+                "Please check the asset configuration and|or the action parameters."
         except:
             error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 
@@ -559,7 +565,7 @@ class AzureADGraphConnector(BaseConnector):
         response obtained by making an API call
         """
 
-        url = "{0}/{1}{2}".format(AZUREADGRAPH_API_URL, self._tenant, endpoint)
+        url = "{0}/{1}{2}".format(self._base_url, self._tenant, endpoint)
         if headers is None:
             headers = {}
 
@@ -580,7 +586,8 @@ class AzureADGraphConnector(BaseConnector):
 
         # If token is expired, generate a new token
         msg = action_result.get_message()
-        if msg and 'token is invalid' in msg or 'token has expired' in msg or 'ExpiredAuthenticationToken' in msg or 'AuthenticationFailed' in msg:
+        if msg and 'token is invalid' in msg or 'token has expired' in msg or \
+                'ExpiredAuthenticationToken' in msg or 'AuthenticationFailed' in msg:
             self.save_progress("bad token")
             ret_val = self._get_token(action_result)
 
@@ -1036,7 +1043,10 @@ class AzureADGraphConnector(BaseConnector):
         user_object_ids = list()
         for item in response.get('value', []):
             url = item.get('url', '')
-            match = re.match('https:\\/\\/graph.windows.net\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(self._tenant), url)
+            match = re.match(
+                'https:\\/\\/graph.windows.net\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(self._tenant),
+                url
+            )
             if match is not None:
                 user_object_ids.append(match.group(1))
 
@@ -1097,7 +1107,10 @@ class AzureADGraphConnector(BaseConnector):
         user_object_ids = list()
         for item in response.get('value', []):
             url = item.get('url', '')
-            match = re.match('https:\\/\\/graph.windows.net\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(self._tenant), url)
+            match = re.match(
+                'https:\\/\\/graph.windows.net\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(self._tenant),
+                url
+            )
             if match is not None:
                 user_object_ids.append(match.group(1))
 
@@ -1288,6 +1301,7 @@ class AzureADGraphConnector(BaseConnector):
         self._client_secret = config[MS_AZURE_CONFIG_CLIENT_SECRET]
         self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING)
+        self._base_url = AZUREADGRAPH_API_URLS[config.get(MS_AZURE_URL, "Global")]
 
         return phantom.APP_SUCCESS
 
@@ -1301,8 +1315,9 @@ class AzureADGraphConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import pudb
     import argparse
+
+    import pudb
 
     pudb.set_trace()
 
@@ -1311,24 +1326,26 @@ if __name__ == '__main__':
     argparser.add_argument('input_test_json', help='Input Test JSON file')
     argparser.add_argument('-u', '--username', help='username', required=False)
     argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
 
     args = argparser.parse_args()
     session_id = None
 
     username = args.username
     password = args.password
+    verify = args.verify
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
             print("Accessing the Login page")
-            r = requests.get(login_url, verify=False)
+            r = requests.get(login_url, verify=verify, timeout=60)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1341,11 +1358,11 @@ if __name__ == '__main__':
             headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=60)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platform. Error: " + str(e))
-            exit(1)
+            sys.exit(1)
 
     with open(args.input_test_json) as f:
         in_json = f.read()
@@ -1355,11 +1372,11 @@ if __name__ == '__main__':
         connector = AzureADGraphConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
-    exit(0)
+    sys.exit(0)
