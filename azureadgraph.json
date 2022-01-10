@@ -29,10 +29,6 @@
             "required": true,
             "order": 0
         },
-        "ph": {
-            "data_type": "ph",
-            "order": 1
-        },
         "client_id": {
             "description": "Application ID",
             "data_type": "string",
@@ -49,7 +45,7 @@
             "data_type": "string",
             "description": "Azure AD Region",
             "default": "Global",
-            "order": 4,
+            "order": 1,
             "value_list": [
                 "Global",
                 "US Gov",
