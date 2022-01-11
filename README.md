@@ -2,7 +2,7 @@
 # Azure AD Graph
 
 Publisher: Splunk  
-Connector Version: 2\.1\.6  
+Connector Version: 2\.1\.8  
 Product Vendor: Microsoft  
 Product Name: Azure AD Graph  
 Product Version Supported (regex): "\.\*"  
@@ -10,7 +10,7 @@ Minimum Product Version: 4\.10\.0\.40961
 
 Connects to Azure AD Graph REST API services
 
-[comment]: # " File: readme.md"
+[comment]: # " File: README.md"
 [comment]: # "  Copyright (c) 2019-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
