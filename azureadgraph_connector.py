@@ -466,7 +466,7 @@ class AzureADGraphConnector(BaseConnector):
         asset_id = self.get_asset_id()
         rest_endpoint = MS_AZURE_PHANTOM_ASSET_INFO_URL.format(asset_id=asset_id)
         url = '{}{}'.format(MS_AZURE_PHANTOM_BASE_URL.format(phantom_base_url=self._get_phantom_base_url()), rest_endpoint)
-        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
+        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)  # nosemgrep
 
         if phantom.is_fail(ret_val):
             return ret_val, None
@@ -485,7 +485,7 @@ class AzureADGraphConnector(BaseConnector):
         """
 
         url = '{}{}'.format(MS_AZURE_PHANTOM_BASE_URL.format(phantom_base_url=self._get_phantom_base_url()), MS_AZURE_PHANTOM_SYS_INFO_URL)
-        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
+        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)  # nosemgrep
         if phantom.is_fail(ret_val):
             return ret_val, None
 
@@ -616,6 +616,7 @@ class AzureADGraphConnector(BaseConnector):
 
         # Progress
         # self.save_progress("Generating Authentication URL")
+        config = self.get_config()
         app_state = {}
         action_result = self.add_action_result(ActionResult(param))
 
@@ -649,7 +650,7 @@ class AzureADGraphConnector(BaseConnector):
         admin_consent_url += "&redirect_uri={0}".format(redirect_uri)
         admin_consent_url += "&state={0}".format(self.get_asset_id())
         admin_consent_url += "&scope={0}".format(MS_AZURE_CODE_GENERATION_SCOPE)
-        admin_consent_url += "&resource=https%3A%2F%2Fgraph.windows.net%2F"
+        admin_consent_url += "&resource=https%3A%2F%2F{0}%2F".format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")])
         admin_consent_url += "&response_type=code"
 
         app_state['admin_consent_url'] = admin_consent_url
@@ -908,6 +909,7 @@ class AzureADGraphConnector(BaseConnector):
 
     def _handle_add_user(self, param):
 
+        config = self.get_config()
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -919,7 +921,7 @@ class AzureADGraphConnector(BaseConnector):
         }
 
         data = {
-            'url': "https://graph.windows.net/{}/directoryObjects/{}".format(self._tenant, user_id)
+            'url': "https://{}/{}/directoryObjects/{}".format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant, user_id)
         }
 
         endpoint = '/groups/{}/$links/members'.format(object_id)
@@ -1026,6 +1028,7 @@ class AzureADGraphConnector(BaseConnector):
 
     def _handle_list_group_members(self, param):
 
+        config = self.get_config()
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1044,7 +1047,9 @@ class AzureADGraphConnector(BaseConnector):
         for item in response.get('value', []):
             url = item.get('url', '')
             match = re.match(
-                'https:\\/\\/graph.windows.net\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(self._tenant),
+                'https:\\/\\/{}\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(
+                    AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant
+                ),
                 url
             )
             if match is not None:
@@ -1089,6 +1094,7 @@ class AzureADGraphConnector(BaseConnector):
 
     def _handle_validate_group(self, param):
 
+        config = self.get_config()
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1108,7 +1114,9 @@ class AzureADGraphConnector(BaseConnector):
         for item in response.get('value', []):
             url = item.get('url', '')
             match = re.match(
-                'https:\\/\\/graph.windows.net\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(self._tenant),
+                'https:\\/\\/{}\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(
+                    AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant
+                ),
                 url
             )
             if match is not None:

@@ -22,6 +22,12 @@ AZUREADGRAPH_API_URLS = {
     "Germany": "https://graph.cloudapi.de",
     "China (21Vianet)": "https://graph.chinacloudapi.cn"
 }
+AZUREADGRAPH_API_REGION = {
+    "Global": "graph.windows.net",
+    "US Gov": "graph.microsoftazure.us",
+    "Germany": "graph.cloudapi.de",
+    "China (21Vianet)": "graph.chinacloudapi.cn"
+}
 MS_AZURE_CONFIG_TENANT = 'tenant_id'
 MS_AZURE_CONFIG_SUBSCRIPTION = 'subscription_id'
 MS_AZURE_CONFIG_CLIENT_ID = 'client_id'

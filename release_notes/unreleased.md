@@ -1,2 +1,2 @@
 **Unreleased**
-* Added 'region' parameter in configuration [PAPP-8280]
+* Added a new configuration parameter to select the Azure AD region [PAPP-8280]
