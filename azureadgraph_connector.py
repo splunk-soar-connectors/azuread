@@ -20,23 +20,17 @@ import json
 import os
 import pwd
 import re
-# import random
-# import base64
 import sys
 import time
 
 import phantom.app as phantom
 import requests
 from bs4 import BeautifulSoup, UnicodeDammit
-# from datetime import datetime, timedelta
 from django.http import HttpResponse
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 
 from azureadgraph_consts import *
-
-# from phantom.vault import Vault
-
 
 try:
     import urllib.parse as urlparse
@@ -586,8 +580,7 @@ class AzureADGraphConnector(BaseConnector):
 
         # If token is expired, generate a new token
         msg = action_result.get_message()
-        if msg and 'token is invalid' in msg or 'token has expired' in msg or \
-                'ExpiredAuthenticationToken' in msg or 'AuthenticationFailed' in msg:
+        if msg and any(failure_message in msg for failure_message in AUTH_FAILURE_MESSAGES):
             self.save_progress("bad token")
             ret_val = self._get_token(action_result)
 
@@ -645,13 +638,20 @@ class AzureADGraphConnector(BaseConnector):
             self._client_id = urlparse.quote(self._client_id)
             self._tenant = urlparse.quote(self._tenant)
 
-        admin_consent_url = "https://login.microsoftonline.com/{0}/oauth2/authorize".format(self._tenant)
-        admin_consent_url += "?client_id={0}".format(self._client_id)
-        admin_consent_url += "&redirect_uri={0}".format(redirect_uri)
-        admin_consent_url += "&state={0}".format(self.get_asset_id())
-        admin_consent_url += "&scope={0}".format(MS_AZURE_CODE_GENERATION_SCOPE)
-        admin_consent_url += "&resource=https%3A%2F%2F{0}%2F".format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")])
-        admin_consent_url += "&response_type=code"
+        admin_consent_url_base = "https://login.microsoftonline.com/{0}/oauth2/authorize".format(self._tenant)
+
+        query_params = {
+            'client_id': self._client_id,
+            'redirect_uri': redirect_uri,
+            'state': self.get_asset_id(),
+            'scope': MS_AZURE_CODE_GENERATION_SCOPE,
+            'resource': "https%3A%2F%2F{0}%2F".format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")]),
+            'response_type': "code"
+        }
+
+        query_string = '&'.join(f'{key}={value}' for key, value in query_params.items())
+
+        admin_consent_url = f'{admin_consent_url_base}?{query_string}'
 
         app_state['admin_consent_url'] = admin_consent_url
 
@@ -1047,7 +1047,7 @@ class AzureADGraphConnector(BaseConnector):
         for item in response.get('value', []):
             url = item.get('url', '')
             match = re.match(
-                'https:\\/\\/{}\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(
+                AZUREADGRAPH_API_REGEX.format(
                     AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant
                 ),
                 url
@@ -1114,7 +1114,7 @@ class AzureADGraphConnector(BaseConnector):
         for item in response.get('value', []):
             url = item.get('url', '')
             match = re.match(
-                'https:\\/\\/{}\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(
+                AZUREADGRAPH_API_REGEX.format(
                     AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant
                 ),
                 url
