@@ -15,31 +15,29 @@
 #
 #
 # Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-# from phantom.vault import Vault
-
-# from datetime import datetime, timedelta
-from django.http import HttpResponse
-from azureadgraph_consts import *
-from bs4 import BeautifulSoup, UnicodeDammit
-
-import requests
-# import random
-# import base64
-import sys
-import json
-import time
-import pwd
 import grp
+import json
 import os
+import pwd
 import re
+import sys
+import time
+
+import phantom.app as phantom
+import requests
+from bs4 import BeautifulSoup, UnicodeDammit
+from django.http import HttpResponse
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+
+from azureadgraph_consts import *
+
 try:
     import urllib.parse as urlparse
 except ImportError:
-    import urlparse
     import urllib
+
+    import urlparse
 
 TC_FILE = "oauth_task.out"
 SERVER_TOKEN_URL = "https://login.microsoftonline.com/{0}/oauth2/token"
@@ -276,6 +274,7 @@ class AzureADGraphConnector(BaseConnector):
         self._client_secret = None
         self._access_token = None
         self._refresh_token = None
+        self._base_url = None
 
     def _handle_py_ver_compat_for_input_str(self, input_str):
         """
@@ -316,7 +315,8 @@ class AzureADGraphConnector(BaseConnector):
         try:
             error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
         except TypeError:
-            error_msg = "Error occurred while connecting to the Microsoft Teams server. Please check the asset configuration and|or the action parameters."
+            error_msg = "Error occurred while connecting to the Microsoft Teams server."\
+                "Please check the asset configuration and|or the action parameters."
         except:
             error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 
@@ -460,7 +460,7 @@ class AzureADGraphConnector(BaseConnector):
         asset_id = self.get_asset_id()
         rest_endpoint = MS_AZURE_PHANTOM_ASSET_INFO_URL.format(asset_id=asset_id)
         url = '{}{}'.format(MS_AZURE_PHANTOM_BASE_URL.format(phantom_base_url=self._get_phantom_base_url()), rest_endpoint)
-        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
+        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)  # nosemgrep
 
         if phantom.is_fail(ret_val):
             return ret_val, None
@@ -479,7 +479,7 @@ class AzureADGraphConnector(BaseConnector):
         """
 
         url = '{}{}'.format(MS_AZURE_PHANTOM_BASE_URL.format(phantom_base_url=self._get_phantom_base_url()), MS_AZURE_PHANTOM_SYS_INFO_URL)
-        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)
+        ret_val, resp_json = self._make_rest_call(action_result=action_result, endpoint=url, verify=False)  # nosemgrep
         if phantom.is_fail(ret_val):
             return ret_val, None
 
@@ -559,7 +559,7 @@ class AzureADGraphConnector(BaseConnector):
         response obtained by making an API call
         """
 
-        url = "{0}/{1}{2}".format(AZUREADGRAPH_API_URL, self._tenant, endpoint)
+        url = "{0}/{1}{2}".format(self._base_url, self._tenant, endpoint)
         if headers is None:
             headers = {}
 
@@ -580,7 +580,7 @@ class AzureADGraphConnector(BaseConnector):
 
         # If token is expired, generate a new token
         msg = action_result.get_message()
-        if msg and 'token is invalid' in msg or 'token has expired' in msg or 'ExpiredAuthenticationToken' in msg or 'AuthenticationFailed' in msg:
+        if msg and any(failure_message in msg for failure_message in AUTH_FAILURE_MESSAGES):
             self.save_progress("bad token")
             ret_val = self._get_token(action_result)
 
@@ -609,6 +609,7 @@ class AzureADGraphConnector(BaseConnector):
 
         # Progress
         # self.save_progress("Generating Authentication URL")
+        config = self.get_config()
         app_state = {}
         action_result = self.add_action_result(ActionResult(param))
 
@@ -637,13 +638,20 @@ class AzureADGraphConnector(BaseConnector):
             self._client_id = urlparse.quote(self._client_id)
             self._tenant = urlparse.quote(self._tenant)
 
-        admin_consent_url = "https://login.microsoftonline.com/{0}/oauth2/authorize".format(self._tenant)
-        admin_consent_url += "?client_id={0}".format(self._client_id)
-        admin_consent_url += "&redirect_uri={0}".format(redirect_uri)
-        admin_consent_url += "&state={0}".format(self.get_asset_id())
-        admin_consent_url += "&scope={0}".format(MS_AZURE_CODE_GENERATION_SCOPE)
-        admin_consent_url += "&resource=https%3A%2F%2Fgraph.windows.net%2F"
-        admin_consent_url += "&response_type=code"
+        admin_consent_url_base = "https://login.microsoftonline.com/{0}/oauth2/authorize".format(self._tenant)
+
+        query_params = {
+            'client_id': self._client_id,
+            'redirect_uri': redirect_uri,
+            'state': self.get_asset_id(),
+            'scope': MS_AZURE_CODE_GENERATION_SCOPE,
+            'resource': urlparse.quote('https://{0}/'.format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")]), safe=''),
+            'response_type': "code"
+        }
+
+        query_string = '&'.join(f'{key}={value}' for key, value in query_params.items())
+
+        admin_consent_url = f'{admin_consent_url_base}?{query_string}'
 
         app_state['admin_consent_url'] = admin_consent_url
 
@@ -901,6 +909,7 @@ class AzureADGraphConnector(BaseConnector):
 
     def _handle_add_user(self, param):
 
+        config = self.get_config()
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -912,7 +921,7 @@ class AzureADGraphConnector(BaseConnector):
         }
 
         data = {
-            'url': "https://graph.windows.net/{}/directoryObjects/{}".format(self._tenant, user_id)
+            'url': "https://{}/{}/directoryObjects/{}".format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant, user_id)
         }
 
         endpoint = '/groups/{}/$links/members'.format(object_id)
@@ -1019,6 +1028,7 @@ class AzureADGraphConnector(BaseConnector):
 
     def _handle_list_group_members(self, param):
 
+        config = self.get_config()
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1036,7 +1046,12 @@ class AzureADGraphConnector(BaseConnector):
         user_object_ids = list()
         for item in response.get('value', []):
             url = item.get('url', '')
-            match = re.match('https:\\/\\/graph.windows.net\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(self._tenant), url)
+            match = re.match(
+                AZUREADGRAPH_API_REGEX.format(
+                    AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant
+                ),
+                url
+            )
             if match is not None:
                 user_object_ids.append(match.group(1))
 
@@ -1079,6 +1094,7 @@ class AzureADGraphConnector(BaseConnector):
 
     def _handle_validate_group(self, param):
 
+        config = self.get_config()
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -1097,7 +1113,12 @@ class AzureADGraphConnector(BaseConnector):
         user_object_ids = list()
         for item in response.get('value', []):
             url = item.get('url', '')
-            match = re.match('https:\\/\\/graph.windows.net\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$'.format(self._tenant), url)
+            match = re.match(
+                AZUREADGRAPH_API_REGEX.format(
+                    AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant
+                ),
+                url
+            )
             if match is not None:
                 user_object_ids.append(match.group(1))
 
@@ -1288,6 +1309,7 @@ class AzureADGraphConnector(BaseConnector):
         self._client_secret = config[MS_AZURE_CONFIG_CLIENT_SECRET]
         self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING)
         self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING)
+        self._base_url = AZUREADGRAPH_API_URLS[config.get(MS_AZURE_URL, "Global")]
 
         return phantom.APP_SUCCESS
 
@@ -1301,8 +1323,9 @@ class AzureADGraphConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import pudb
     import argparse
+
+    import pudb
 
     pudb.set_trace()
 
@@ -1311,24 +1334,26 @@ if __name__ == '__main__':
     argparser.add_argument('input_test_json', help='Input Test JSON file')
     argparser.add_argument('-u', '--username', help='username', required=False)
     argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
 
     args = argparser.parse_args()
     session_id = None
 
     username = args.username
     password = args.password
+    verify = args.verify
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         login_url = BaseConnector._get_phantom_base_url() + "login"
         try:
             print("Accessing the Login page")
-            r = requests.get(login_url, verify=False)
+            r = requests.get(login_url, verify=verify, timeout=60)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1341,11 +1366,11 @@ if __name__ == '__main__':
             headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=60)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platform. Error: " + str(e))
-            exit(1)
+            sys.exit(1)
 
     with open(args.input_test_json) as f:
         in_json = f.read()
@@ -1355,11 +1380,11 @@ if __name__ == '__main__':
         connector = AzureADGraphConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
-    exit(0)
+    sys.exit(0)

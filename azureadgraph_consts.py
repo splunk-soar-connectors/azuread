@@ -16,12 +16,24 @@ TC_STATUS_SLEEP = 2
 PHANTOM_SYS_INFO_URL = "{base_url}rest/system_info"
 PHANTOM_ASSET_INFO_URL = "{base_url}rest/asset/{asset_id}"
 
-AZUREADGRAPH_API_URL = "https://graph.windows.net"
-
+AZUREADGRAPH_API_URLS = {
+    "Global": "https://graph.windows.net",
+    "US Gov": "https://graph.microsoftazure.us",
+    "Germany": "https://graph.cloudapi.de",
+    "China (21Vianet)": "https://graph.chinacloudapi.cn"
+}
+AZUREADGRAPH_API_REGION = {
+    "Global": "graph.windows.net",
+    "US Gov": "graph.microsoftazure.us",
+    "Germany": "graph.cloudapi.de",
+    "China (21Vianet)": "graph.chinacloudapi.cn"
+}
+AZUREADGRAPH_API_REGEX = "https:\\/\\/{}\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$"
 MS_AZURE_CONFIG_TENANT = 'tenant_id'
 MS_AZURE_CONFIG_SUBSCRIPTION = 'subscription_id'
 MS_AZURE_CONFIG_CLIENT_ID = 'client_id'
-MS_AZURE_CONFIG_CLIENT_SECRET = 'client_secret'
+MS_AZURE_CONFIG_CLIENT_SECRET = 'client_secret'  # pragma: allowlist secret
+MS_AZURE_URL = "region"
 MS_AZURE_CONFIG_ADMIN_ACCESS = 'admin_access'
 MS_AZURE_TOKEN_STRING = 'token'
 MS_AZURE_ACCESS_TOKEN_STRING = 'access_token'
@@ -38,7 +50,7 @@ MS_AZURE_PAGE_SIZE = 999
 # For authorization code
 TC_FILE = "oauth_task.out"
 SERVER_TOKEN_URL = "https://login.microsoftonline.com/{0}/oauth2/token"
-
+AUTH_FAILURE_MESSAGES = ("token is invalid", "token has expired", "ExpiredAuthenticationToken", "AuthenticationFailed")
 MS_REST_URL_NOT_AVAILABLE_MSG = 'Rest URL not available. Error: {error}'
 MS_OAUTH_URL_MSG = 'Using OAuth URL:\n'
 MS_AUTHORIZE_USER_MSG = 'Please authorize user in a separate tab using URL:'
