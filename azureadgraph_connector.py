@@ -645,7 +645,7 @@ class AzureADGraphConnector(BaseConnector):
             'redirect_uri': redirect_uri,
             'state': self.get_asset_id(),
             'scope': MS_AZURE_CODE_GENERATION_SCOPE,
-            'resource': "https%3A%2F%2F{0}%2F".format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")]),
+            'resource': urlparse.quote('https://{0}/'.format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")]), safe=''),
             'response_type': "code"
         }
 
