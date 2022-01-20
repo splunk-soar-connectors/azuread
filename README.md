@@ -2,11 +2,11 @@
 # Azure AD Graph
 
 Publisher: Splunk  
-Connector Version: 2\.1\.8  
+Connector Version: 2\.2\.2  
 Product Vendor: Microsoft  
 Product Name: Azure AD Graph  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 4\.10\.0\.40961  
+Minimum Product Version: 5\.0\.0  
 
 Connects to Azure AD Graph REST API services
 
@@ -112,6 +112,16 @@ Please check the permissions for the state file as mentioned below.
     file)
 -   File Owner: appropriate phantom user
 
+## Port Information
+
+The app uses HTTP/ HTTPS protocol for communicating with the Mattermost server. Below are the
+default ports used by Splunk SOAR.
+
+|         Service Name | Transport Protocol | Port |
+|----------------------|--------------------|------|
+|         http         | tcp                | 80   |
+|         https        | tcp                | 443  |
+
 
 ### Configuration Variables
 The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a Azure AD Graph asset in SOAR.
@@ -121,6 +131,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **tenant\_id** |  required  | string | Tenant \(Tenant ID or Tenant Name\)
 **client\_id** |  required  | string | Application ID
 **client\_secret** |  required  | password | Client Secret
+**region** |  optional  | string | Azure AD Region
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Use supplied credentials to generate a token with MS Graph  
@@ -281,6 +292,7 @@ action\_result\.parameter\.user\_id | string |  `azure user principal name`  `az
 action\_result\.data | string | 
 action\_result\.data\.\*\.odata\.metadata | string |  `url` 
 action\_result\.data\.\*\.odata\.null | boolean | 
+action\_result\.data\.\*\.value | boolean | 
 action\_result\.summary\.status | string | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
