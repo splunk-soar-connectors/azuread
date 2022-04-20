@@ -40,7 +40,6 @@ except ImportError:
     import urlparse
 
 TC_FILE = "oauth_task.out"
-SERVER_TOKEN_URL = "https://login.microsoftonline.com/{0}/oauth2/token"
 # SERVER_TOKEN_URL = "https://login.microsoftonline.com/{0}/oauth2/v2.0/token"
 MSGRAPH_API_URL = "https://graph.microsoft.com/v1.0"
 AZUREADGRAPH_API_URL = "https://graph.windows.net"
@@ -1147,13 +1146,14 @@ class AzureADGraphConnector(BaseConnector):
         :return: status(phantom.APP_SUCCESS/phantom.APP_ERROR)
         """
 
+        config = self.get_config()
         data = {
             'client_id': self._client_id,
             'client_secret': self._client_secret,
             'grant_type': 'client_credentials',
         }
 
-        req_url = SERVER_TOKEN_URL.format(self._tenant)
+        req_url = AZUREADGRAPH_SERVER_TOKEN_URLS[config.get(MS_AZURE_URL, "Global")].format(self._tenant)
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
         }

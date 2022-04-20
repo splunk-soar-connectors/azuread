@@ -28,6 +28,12 @@ AZUREADGRAPH_API_REGION = {
     "Germany": "graph.cloudapi.de",
     "China (21Vianet)": "graph.chinacloudapi.cn"
 }
+AZUREADGRAPH_SERVER_TOKEN_URLS = {
+    "Global": "https://login.microsoftonline.com/{0}/oauth2/token",
+    "US Gov": "https://login.microsoftonline.us/{0}/oauth2/token",
+    "Germany": "https://login.microsoftonline.de/{0}/oauth2/token",
+    "China (21Vianet)": "https://login.chinacloudapi.cn/{0}/oauth2/token"
+}
 AZUREADGRAPH_API_REGEX = "https:\\/\\/{}\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$"
 MS_AZURE_CONFIG_TENANT = 'tenant_id'
 MS_AZURE_CONFIG_SUBSCRIPTION = 'subscription_id'
