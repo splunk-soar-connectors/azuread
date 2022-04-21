@@ -232,7 +232,7 @@ def _handle_rest_request(request, path_parts):
                 gid = grp.getgrnam('phantom').gr_gid
                 os.chown(auth_status_file_path, uid, gid)
                 os.chmod(auth_status_file_path, '0664')
-            except:
+            except Exception:
                 pass
 
         return return_val
@@ -284,7 +284,7 @@ class AzureADGraphConnector(BaseConnector):
         try:
             if input_str and self._python_version < 3:
                 input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
+        except Exception:
             self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
 
         return input_str
@@ -294,32 +294,25 @@ class AzureADGraphConnector(BaseConnector):
         :param e: Exception object
         :return: error message
         """
-        error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
-        error_code = "Error code unavailable"
+        error_code = None
+        error_msg = ERR_MSG_UNAVAILABLE
+
         try:
-            if e.args:
+            if hasattr(e, "args"):
                 if len(e.args) > 1:
                     error_code = e.args[0]
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
-                    error_code = "Error code unavailable"
                     error_msg = e.args[0]
-            else:
-                error_code = "Error code unavailable"
-                error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
-        except:
-            error_code = "Error code unavailable"
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+        except Exception:
+            pass
 
-        try:
-            error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
-        except TypeError:
-            error_msg = "Error occurred while connecting to the Microsoft Teams server."\
-                "Please check the asset configuration and|or the action parameters."
-        except:
-            error_msg = "Unknown error occurred. Please check the asset configuration and|or action parameters."
+        if not error_code:
+            error_text = "Error Message: {}".format(error_msg)
+        else:
+            error_text = "Error Code: {}. Error Message: {}".format(error_code, error_msg)
 
-        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+        return error_text
 
     def _process_empty_response(self, response, action_result):
         """ This function is used to process empty response.
@@ -332,7 +325,7 @@ class AzureADGraphConnector(BaseConnector):
         if response.status_code == 200 or response.status_code == 202:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, "Empty response and no information in the header"),
+        return RetVal(action_result.set_status(phantom.APP_ERROR, MS_AZURE_ERR_EMPTY_RESPONSE.format(code=response.status_code)),
                       None)
 
     def _process_html_response(self, response, action_result):
@@ -355,7 +348,7 @@ class AzureADGraphConnector(BaseConnector):
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
-        except:
+        except Exception:
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
@@ -610,7 +603,7 @@ class AzureADGraphConnector(BaseConnector):
         # self.save_progress("Generating Authentication URL")
         config = self.get_config()
         app_state = {}
-        action_result = self.add_action_result(ActionResult(param))
+        action_result = self.add_action_result(ActionResult(dict(param)))
 
         self.save_progress("Getting App REST endpoint URL")
         # Get the URL to the app's REST Endpoint, this is the url that the TC dialog
@@ -618,8 +611,8 @@ class AzureADGraphConnector(BaseConnector):
         ret_val, app_rest_url = self._get_app_rest_url(action_result)
 
         if phantom.is_fail(ret_val):
-            self.save_progress(MS_REST_URL_NOT_AVAILABLE_MSG.format(error=self.get_status()))
-            return self.set_status(phantom.APP_ERROR)
+            self.save_progress(MS_REST_URL_NOT_AVAILABLE_MSG.format(error=action_result.get_status()))
+            return action_result.set_status(phantom.APP_ERROR)
 
         # create the url that the oauth server should re-direct to after the auth is completed
         # (success and failure), this is added to the state so that the request handler will access
@@ -687,7 +680,7 @@ class AzureADGraphConnector(BaseConnector):
 
         if not completed:
             self.save_progress("Authentication process does not seem to be completed. Timing out")
-            return self.set_status(phantom.APP_ERROR)
+            return action_result.set_status(phantom.APP_ERROR)
 
         self.send_progress("")
 
@@ -697,7 +690,7 @@ class AzureADGraphConnector(BaseConnector):
         if not self._state:
             self.save_progress("Authorization not received or not given")
             self.save_progress("Test Connectivity Failed")
-            return self.set_status(phantom.APP_ERROR)
+            return action_result.set_status(phantom.APP_ERROR)
 
         # The authentication seems to be done, let's see if it was successful
         self._state['admin_consent'] = self._state.get('admin_consent', False)
@@ -715,7 +708,7 @@ class AzureADGraphConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             self.save_progress("API to get users failed")
             self.save_progress("Test Connectivity Failed")
-            return self.set_status(phantom.APP_ERROR)
+            return action_result.set_status(phantom.APP_ERROR)
 
         value = response.get('value')
 
@@ -724,7 +717,7 @@ class AzureADGraphConnector(BaseConnector):
 
         self.save_progress("Test Connectivity Passed")
 
-        return self.set_status(phantom.APP_SUCCESS)
+        return action_result.set_status(phantom.APP_SUCCESS)
 
     def _handle_list_users(self, param):
 
@@ -1211,7 +1204,7 @@ class AzureADGraphConnector(BaseConnector):
                 parsed_url = urlparse.urlparse(response.get(MS_AZURE_NEXT_LINK_STRING))
                 try:
                     parameters['$skiptoken'] = urlparse.parse_qs(parsed_url.query).get('$skiptoken')[0]
-                except:
+                except Exception:
                     self.debug_print("odata.nextLink is {0}".format(response.get(MS_AZURE_NEXT_LINK_STRING)))
                     self.debug_print("Error occurred while extracting skiptoken from the odata.nextLink")
                     break
@@ -1295,10 +1288,17 @@ class AzureADGraphConnector(BaseConnector):
 
         self._state = self.load_state()
 
+        if not isinstance(self._state, dict):
+            self.debug_print("Resetting the state file with the default format")
+            self._state = {
+                "app_version": self.get_app_json().get('app_version')
+            }
+            return self.set_status(phantom.APP_ERROR, MS_AZURE_STATE_FILE_CORRUPT_ERR)
+
         # Fetching the Python major version
         try:
             self._python_version = int(sys.version_info[0])
-        except:
+        except Exception:
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
         # get the asset config

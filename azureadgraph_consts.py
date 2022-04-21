@@ -16,6 +16,7 @@ TC_STATUS_SLEEP = 2
 PHANTOM_SYS_INFO_URL = "{base_url}rest/system_info"
 PHANTOM_ASSET_INFO_URL = "{base_url}rest/asset/{asset_id}"
 
+# API URLs according to regions
 AZUREADGRAPH_API_URLS = {
     "Global": "https://graph.windows.net",
     "US Gov": "https://graph.microsoftazure.us",
@@ -28,6 +29,7 @@ AZUREADGRAPH_API_REGION = {
     "Germany": "graph.cloudapi.de",
     "China (21Vianet)": "graph.chinacloudapi.cn"
 }
+# Token URLs according to regions
 AZUREADGRAPH_SERVER_TOKEN_URLS = {
     "Global": "https://login.microsoftonline.com/{0}/oauth2/token",
     "US Gov": "https://login.microsoftonline.us/{0}/oauth2/token",
@@ -50,6 +52,10 @@ MS_AZURE_PHANTOM_ASSET_INFO_URL = '/asset/{asset_id}'
 MS_AZURE_BASE_URL_NOT_FOUND_MSG = 'Phantom Base URL not found in System Settings. ' \
                                 'Please specify this value in System Settings.'
 MS_AZURE_HTML_ERROR = 'Bad Request Bad Request - Invalid URL HTTP Error 400. The request URL is invalid.'
+MS_AZURE_ERR_EMPTY_RESPONSE = "Status Code {code}. Empty response and no information in the header."
+ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
+MS_AZURE_STATE_FILE_CORRUPT_ERR = "Error occurred while loading the state file due to its unexpected format. " \
+    "Resetting the state file with the default format. Please try again."
 MS_AZURE_NEXT_LINK_STRING = 'odata.nextLink'
 MS_AZURE_PAGE_SIZE = 999
 

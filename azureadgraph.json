@@ -299,8 +299,7 @@
                     "data_path": "action_result.data.*.otherMails",
                     "data_type": "string",
                     "example_values": [
-                        "user.test@outlook.com",
-                        "user@test.us"
+                        "user.test@outlook.com"
                     ],
                     "contains": [
                         "email"
@@ -387,8 +386,7 @@
                     "data_path": "action_result.data.*.refreshTokensValidFromDateTime",
                     "data_type": "string",
                     "example_values": [
-                        "2017-09-27T22:54:59Z",
-                        "2018-01-10T22:18:17Z"
+                        "2017-09-27T22:54:59Z"
                     ]
                 },
                 {
@@ -586,8 +584,7 @@
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "example_values": [
-                        "ee3dc4f2-70f9-446f-a19e-6b4e95ba030d",
-                        "user@test.onmicrosoft.com"
+                        "ee3dc4f2-70f9-446f-a19e-6b4e95ba030d"
                     ],
                     "contains": [
                         "azure user principal name",
@@ -612,7 +609,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully reset user password",
                         "Status: Successfully reset user password"
                     ]
                 },
@@ -674,8 +670,7 @@
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "example_values": [
-                        "ee3dc4f2-70f9-446f-a19e-6b4e95ba030d",
-                        "user@test.onmicrosoft.com"
+                        "ee3dc4f2-70f9-446f-a19e-6b4e95ba030d"
                     ],
                     "contains": [
                         "azure user principal name",
@@ -726,7 +721,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully invalidated tokens",
                         "Status: Successfully disabled tokens"
                     ]
                 },
@@ -1296,7 +1290,6 @@
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully retrieved user attributes",
                         "Successfully retrieved attributes for user user@test.onmicrosoft.com"
                     ]
                 },
@@ -1312,7 +1305,6 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Status: Successfully retrieved user attributes",
                         "Status: Successfully retrieved attributes for user user@test.onmicrosoft.com, User enabled: False"
                     ]
                 },
@@ -1528,16 +1520,14 @@
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully removed user from group",
-                        "User not in group"
+                        "Successfully removed user from group"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Status: Successfully removed user from group",
-                        "Status: User not in group"
+                        "Status: Successfully removed user from group"
                     ]
                 },
                 {
@@ -1632,16 +1622,14 @@
                     "data_path": "action_result.summary.status",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully added user to group",
-                        "User already in group"
+                        "Successfully added user to group"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Status: Successfully added user to group",
-                        "Status: User already in group"
+                        "Status: Successfully added user to group"
                     ]
                 },
                 {
