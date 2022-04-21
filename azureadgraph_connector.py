@@ -1246,9 +1246,6 @@ class AzureADGraphConnector(BaseConnector):
         elif action_id == 'set_user_attribute':
             ret_val = self._handle_set_user_attribute(param)
 
-        elif action_id == 'list_user_groups':
-            ret_val = self._handle_list_user_groups(param)
-
         elif action_id == 'remove_user':
             ret_val = self._handle_remove_user(param)
 
@@ -1269,9 +1266,6 @@ class AzureADGraphConnector(BaseConnector):
 
         elif action_id == 'list_directory_roles':
             ret_val = self._handle_list_directory_roles(param)
-
-        elif action_id == 'list_policies':
-            ret_val = self._handle_list_policies(param)
 
         elif action_id == 'generate_token':
             ret_val = self._handle_generate_token(param)
