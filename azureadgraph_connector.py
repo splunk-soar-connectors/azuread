@@ -23,6 +23,7 @@ import re
 import sys
 import time
 
+import encryption_helper
 import phantom.app as phantom
 import requests
 from bs4 import BeautifulSoup, UnicodeDammit
@@ -189,7 +190,11 @@ def _handle_login_response(request):
         return HttpResponse('Admin Consent declined. Please close this window and try again later.', content_type="text/plain", status=400)
 
     # If value of admin_consent is not available, value of code is available
-    state['code'] = code
+    try:
+        state['code'] = AzureADGraphConnector().encrypt_state(code, "code")
+    except Exception as e:
+        return HttpResponse("{}: {}".format(MS_AZURE_DECRYPTION_ERR, str(e)), content_type="text/plain", status=400)
+
     _save_app_state(state, asset_id, None)
 
     return HttpResponse('Code received. Please close this window, the action will continue to get new token.', content_type="text/plain")
@@ -274,6 +279,25 @@ class AzureADGraphConnector(BaseConnector):
         self._access_token = None
         self._refresh_token = None
         self._base_url = None
+        self.asset_id = self.get_asset_id()
+
+    def encrypt_state(self, encrypt_var, token_name):
+        """ Handle encryption of token.
+
+        :param encrypt_var: Variable needs to be encrypted
+        :return: encrypted variable
+        """
+        self.debug_print(MS_AZURE_ENCRYPT_TOKEN.format(token_name))
+        return encryption_helper.encrypt(encrypt_var, self.asset_id)
+
+    def decrypt_state(self, decrypt_var, token_name):
+        """ Handle decryption of token.
+
+        :param decrypt_var: Variable needs to be decrypted
+        :return: decrypted variable
+        """
+        self.debug_print(MS_AZURE_DECRYPT_TOKEN.format(token_name))
+        return encryption_helper.decrypt(decrypt_var, self.asset_id)
 
     def _handle_py_ver_compat_for_input_str(self, input_str):
         """
@@ -1152,21 +1176,46 @@ class AzureADGraphConnector(BaseConnector):
         }
 
         if from_action or self._state.get('token', {}).get('refresh_token', None) is not None:
-            data['refresh_token'] = self._state.get('token').get('refresh_token')
+            try:
+                data['refresh_token'] = self.decrypt_state(self._state.get('token').get('refresh_token'), "refresh")
+            except Exception as e:
+                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
+                return action_result.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
             data['grant_type'] = 'refresh_token'
         else:
             data['redirect_uri'] = self._state.get('redirect_uri')
-            data['code'] = self._state.get('code')
+            try:
+                data['code'] = self.decrypt_state(self._state.get('code'), "code")
+            except Exception as e:
+                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
+                return action_result.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
             data['grant_type'] = 'authorization_code'
 
         ret_val, resp_json = self._make_rest_call(req_url, action_result, headers=headers, data=data, method='post')
 
+        if resp_json.get('id_token'):
+            resp_json.pop('id_token')
+
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
-        self._state[MS_AZURE_TOKEN_STRING] = resp_json
         self._access_token = resp_json[MS_AZURE_ACCESS_TOKEN_STRING]
         self._refresh_token = resp_json[MS_AZURE_REFRESH_TOKEN_STRING]
+        try:
+            encrypted_access_token = self.encrypt_state(resp_json[MS_AZURE_ACCESS_TOKEN_STRING], "access")
+        except Exception as e:
+            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
+            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
+        try:
+            encrypted_refresh_token = self.encrypt_state(resp_json[MS_AZURE_REFRESH_TOKEN_STRING], "refresh")
+        except Exception as e:
+            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
+            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
+
+        resp_json[MS_AZURE_ACCESS_TOKEN_STRING] = encrypted_access_token
+        resp_json[MS_AZURE_REFRESH_TOKEN_STRING] = encrypted_refresh_token
+
+        self._state[MS_AZURE_TOKEN_STRING] = resp_json
         self.save_state(self._state)
 
         return phantom.APP_SUCCESS
@@ -1302,12 +1351,41 @@ class AzureADGraphConnector(BaseConnector):
         self._client_id = self._handle_py_ver_compat_for_input_str(config[MS_AZURE_CONFIG_CLIENT_ID])
         self._client_secret = config[MS_AZURE_CONFIG_CLIENT_SECRET]
         self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING)
+
+        try:
+            if self._access_token:
+                self._access_token = self.decrypt_state(self._access_token, "access")
+        except Exception as e:
+            self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
+            return self.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
+
         self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING)
+        try:
+            if self._refresh_token:
+                self._refresh_token = self.decrypt_state(self._refresh_token, "refresh")
+        except Exception as e:
+            self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
+            return self.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
+
         self._base_url = AZUREADGRAPH_API_URLS[config.get(MS_AZURE_URL, "Global")]
 
         return phantom.APP_SUCCESS
 
     def finalize(self):
+
+        try:
+            if self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING):
+                self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_ACCESS_TOKEN_STRING] = self.encrypt_state(self._access_token, "access")
+        except Exception as e:
+            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
+            return self.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
+
+        try:
+            if self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING):
+                self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_REFRESH_TOKEN_STRING] = self.encrypt_state(self._refresh_token, "refresh")
+        except Exception as e:
+            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
+            return self.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
 
         # Save the state, this data is saved across actions and app upgrades
         self.save_state(self._state)

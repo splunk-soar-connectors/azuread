@@ -72,3 +72,10 @@ MS_AZURE_CODE_GENERATION_SCOPE = 'Group.ReadWrite.All User.Read.All User.ReadWri
 MS_AZURE_AUTHORIZE_TROUBLESHOOT_MSG = 'If authorization URL fails to communicate with your Phantom instance, check whether you have:  '\
                                 ' 1. Specified the Web Redirect URL of your App -- The Redirect URL should be <POST URL>/result . '\
                                 ' 2. Configured the base URL of your Phantom Instance at Administration -> Company Settings -> Info'
+
+
+# For encryption and decryption
+MS_AZURE_ENCRYPT_TOKEN = "Encrypting the {} token"
+MS_AZURE_DECRYPT_TOKEN = "Decrypting the {} token"
+MS_AZURE_ENCRYPTION_ERR = "Error occurred while encrypting the state file"
+MS_AZURE_DECRYPTION_ERR = "Error occurred while decrypting the state file"
