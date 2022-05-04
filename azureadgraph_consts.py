@@ -44,6 +44,7 @@ MS_AZURE_CONFIG_CLIENT_SECRET = 'client_secret'  # pragma: allowlist secret
 MS_AZURE_URL = "region"
 MS_AZURE_CONFIG_ADMIN_ACCESS = 'admin_access'
 MS_AZURE_TOKEN_STRING = 'token'
+MS_AZURE_STATE_IS_ENCRYPTED = 'is_encrypted'
 MS_AZURE_ACCESS_TOKEN_STRING = 'access_token'
 MS_AZURE_REFRESH_TOKEN_STRING = 'refresh_token'
 MS_AZURE_PHANTOM_BASE_URL = '{phantom_base_url}rest'
@@ -55,7 +56,7 @@ MS_AZURE_HTML_ERROR = 'Bad Request Bad Request - Invalid URL HTTP Error 400. The
 MS_AZURE_ERR_EMPTY_RESPONSE = "Status Code {code}. Empty response and no information in the header."
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
 MS_AZURE_STATE_FILE_CORRUPT_ERR = "Error occurred while loading the state file due to its unexpected format. " \
-    "Resetting the state file with the default format. Please try again."
+    "Resetting the state file with the default format. Please test the connectivity."
 MS_AZURE_NEXT_LINK_STRING = 'odata.nextLink'
 MS_AZURE_PAGE_SIZE = 999
 
