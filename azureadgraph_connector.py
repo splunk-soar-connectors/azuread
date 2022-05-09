@@ -1197,11 +1197,11 @@ class AzureADGraphConnector(BaseConnector):
 
         ret_val, resp_json = self._make_rest_call(req_url, action_result, headers=headers, data=data, method='post')
 
-        if resp_json.get('id_token'):
-            resp_json.pop('id_token')
-
         if phantom.is_fail(ret_val):
             return action_result.get_status()
+
+        if resp_json.get('id_token'):
+            resp_json.pop('id_token')
 
         self._access_token = resp_json[MS_AZURE_ACCESS_TOKEN_STRING]
         self._refresh_token = resp_json[MS_AZURE_REFRESH_TOKEN_STRING]
