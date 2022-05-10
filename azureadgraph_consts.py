@@ -56,7 +56,7 @@ MS_AZURE_HTML_ERROR = 'Bad Request Bad Request - Invalid URL HTTP Error 400. The
 MS_AZURE_ERR_EMPTY_RESPONSE = "Status Code {code}. Empty response and no information in the header."
 ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
 MS_AZURE_STATE_FILE_CORRUPT_ERR = "Error occurred while loading the state file due to its unexpected format. " \
-    "Resetting the state file with the default format. Please test the connectivity."
+    "Resetting the state file with the default format. Please run the test connectivity once."
 MS_AZURE_NEXT_LINK_STRING = 'odata.nextLink'
 MS_AZURE_PAGE_SIZE = 999
 

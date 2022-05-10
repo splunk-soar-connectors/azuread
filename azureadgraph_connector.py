@@ -1179,12 +1179,8 @@ class AzureADGraphConnector(BaseConnector):
             'Content-Type': 'application/x-www-form-urlencoded'
         }
 
-        if from_action or self._state.get('token', {}).get('refresh_token', None) is not None:
-            try:
-                data['refresh_token'] = self.decrypt_state(self._state.get('token').get('refresh_token'), "refresh")
-            except Exception as e:
-                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
-                return action_result.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
+        if from_action or self._refresh_token is not None:
+            data['refresh_token'] = self._refresh_token
             data['grant_type'] = 'refresh_token'
         else:
             data['redirect_uri'] = self._state.get('redirect_uri')
@@ -1205,23 +1201,8 @@ class AzureADGraphConnector(BaseConnector):
 
         self._access_token = resp_json[MS_AZURE_ACCESS_TOKEN_STRING]
         self._refresh_token = resp_json[MS_AZURE_REFRESH_TOKEN_STRING]
-        try:
-            encrypted_access_token = self.encrypt_state(resp_json[MS_AZURE_ACCESS_TOKEN_STRING], "access")
-        except Exception as e:
-            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
-            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
-        try:
-            encrypted_refresh_token = self.encrypt_state(resp_json[MS_AZURE_REFRESH_TOKEN_STRING], "refresh")
-        except Exception as e:
-            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
-            return action_result.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
-
-        resp_json[MS_AZURE_ACCESS_TOKEN_STRING] = encrypted_access_token
-        resp_json[MS_AZURE_REFRESH_TOKEN_STRING] = encrypted_refresh_token
 
         self._state[MS_AZURE_TOKEN_STRING] = resp_json
-        self._state[MS_AZURE_STATE_IS_ENCRYPTED] = True
-        self.save_state(self._state)
 
         return phantom.APP_SUCCESS
 
@@ -1356,7 +1337,7 @@ class AzureADGraphConnector(BaseConnector):
         self._client_id = self._handle_py_ver_compat_for_input_str(config[MS_AZURE_CONFIG_CLIENT_ID])
         self._client_secret = config[MS_AZURE_CONFIG_CLIENT_SECRET]
 
-        self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING)
+        self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING, None)
         if self._state.get(MS_AZURE_STATE_IS_ENCRYPTED) and self._access_token:
             try:
                 self._access_token = self.decrypt_state(self._access_token, "access")
@@ -1364,7 +1345,7 @@ class AzureADGraphConnector(BaseConnector):
                 self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
                 return self.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
 
-        self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING)
+        self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING, None)
         if self._state.get(MS_AZURE_STATE_IS_ENCRYPTED) and self._refresh_token:
             try:
                 self._refresh_token = self.decrypt_state(self._refresh_token, "refresh")

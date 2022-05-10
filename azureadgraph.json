@@ -584,7 +584,8 @@
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "example_values": [
-                        "ee3dc4f2-70f9-446f-a19e-6b4e95ba030d"
+                        "ee3dc4f2-70f9-446f-a19e-6b4e95ba030d",
+                        "user@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "azure user principal name",
@@ -670,7 +671,8 @@
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "example_values": [
-                        "ee3dc4f2-70f9-446f-a19e-6b4e95ba030d"
+                        "ee3dc4f2-70f9-446f-a19e-6b4e95ba030d",
+                        "user@test.onmicrosoft.com"
                     ],
                     "contains": [
                         "azure user principal name",
