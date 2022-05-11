@@ -1185,7 +1185,7 @@ class AzureADGraphConnector(BaseConnector):
         else:
             data['redirect_uri'] = self._state.get('redirect_uri')
             try:
-                data['code'] = self.decrypt_state(self._state.get('code'), "code")
+                data['code'] = self.decrypt_state(self._state.get('code'), "code") if self._state.get('code') else None
             except Exception as e:
                 self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
                 return action_result.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
