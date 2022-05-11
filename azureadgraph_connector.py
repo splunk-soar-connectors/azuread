@@ -1373,6 +1373,16 @@ class AzureADGraphConnector(BaseConnector):
             self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
             return self.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
 
+        if not self._state.get(MS_AZURE_STATE_IS_ENCRYPTED):
+            try:
+                if self._state.get('code'):
+                    self._state['code'] = self.encrypt_state(self._state['code'], "code")
+            except Exception as e:
+                self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
+                return action_result.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
+            if self._state.get(MS_AZURE_TOKEN_STRING, {}).get("id_token"):
+                self._state[MS_AZURE_TOKEN_STRING].pop("id_token")
+
         # Save the state, this data is saved across actions and app upgrades
         self._state[MS_AZURE_STATE_IS_ENCRYPTED] = True
         self.save_state(self._state)
