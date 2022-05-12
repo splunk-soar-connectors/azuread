@@ -2,11 +2,11 @@
 # Azure AD Graph
 
 Publisher: Splunk  
-Connector Version: 2\.2\.2  
+Connector Version: 2\.3\.0  
 Product Vendor: Microsoft  
 Product Name: Azure AD Graph  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.0\.0  
+Minimum Product Version: 5\.2\.0  
 
 Connects to Azure AD Graph REST API services
 
@@ -114,8 +114,8 @@ Please check the permissions for the state file as mentioned below.
 
 ## Port Information
 
-The app uses HTTP/ HTTPS protocol for communicating with the Mattermost server. Below are the
-default ports used by Splunk SOAR.
+The app uses HTTP/ HTTPS protocol for communicating with the Azure AD server. Below are the default
+ports used by Splunk SOAR.
 
 |         Service Name | Transport Protocol | Port |
 |----------------------|--------------------|------|
