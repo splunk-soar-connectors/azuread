@@ -16,6 +16,7 @@ TC_STATUS_SLEEP = 2
 PHANTOM_SYS_INFO_URL = "{base_url}rest/system_info"
 PHANTOM_ASSET_INFO_URL = "{base_url}rest/asset/{asset_id}"
 
+# API URLs according to regions
 AZUREADGRAPH_API_URLS = {
     "Global": "https://graph.windows.net",
     "US Gov": "https://graph.microsoftazure.us",
@@ -28,6 +29,13 @@ AZUREADGRAPH_API_REGION = {
     "Germany": "graph.cloudapi.de",
     "China (21Vianet)": "graph.chinacloudapi.cn"
 }
+# Token URLs according to regions
+AZUREADGRAPH_SERVER_TOKEN_URLS = {
+    "Global": "https://login.microsoftonline.com/{0}/oauth2/token",
+    "US Gov": "https://login.microsoftonline.us/{0}/oauth2/token",
+    "Germany": "https://login.microsoftonline.de/{0}/oauth2/token",
+    "China (21Vianet)": "https://login.chinacloudapi.cn/{0}/oauth2/token"
+}
 AZUREADGRAPH_API_REGEX = "https:\\/\\/{}\\/{}\\/directoryObjects\\/(.+)\\/Microsoft.DirectoryServices.User$"
 MS_AZURE_CONFIG_TENANT = 'tenant_id'
 MS_AZURE_CONFIG_SUBSCRIPTION = 'subscription_id'
@@ -36,6 +44,7 @@ MS_AZURE_CONFIG_CLIENT_SECRET = 'client_secret'  # pragma: allowlist secret
 MS_AZURE_URL = "region"
 MS_AZURE_CONFIG_ADMIN_ACCESS = 'admin_access'
 MS_AZURE_TOKEN_STRING = 'token'
+MS_AZURE_STATE_IS_ENCRYPTED = 'is_encrypted'
 MS_AZURE_ACCESS_TOKEN_STRING = 'access_token'
 MS_AZURE_REFRESH_TOKEN_STRING = 'refresh_token'
 MS_AZURE_PHANTOM_BASE_URL = '{phantom_base_url}rest'
@@ -44,6 +53,10 @@ MS_AZURE_PHANTOM_ASSET_INFO_URL = '/asset/{asset_id}'
 MS_AZURE_BASE_URL_NOT_FOUND_MSG = 'Phantom Base URL not found in System Settings. ' \
                                 'Please specify this value in System Settings.'
 MS_AZURE_HTML_ERROR = 'Bad Request Bad Request - Invalid URL HTTP Error 400. The request URL is invalid.'
+MS_AZURE_ERR_EMPTY_RESPONSE = "Status Code {code}. Empty response and no information in the header."
+ERR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
+MS_AZURE_STATE_FILE_CORRUPT_ERR = "Error occurred while loading the state file due to its unexpected format. " \
+    "Resetting the state file with the default format. Please run the test connectivity once."
 MS_AZURE_NEXT_LINK_STRING = 'odata.nextLink'
 MS_AZURE_PAGE_SIZE = 999
 
@@ -60,3 +73,10 @@ MS_AZURE_CODE_GENERATION_SCOPE = 'Group.ReadWrite.All User.Read.All User.ReadWri
 MS_AZURE_AUTHORIZE_TROUBLESHOOT_MSG = 'If authorization URL fails to communicate with your Phantom instance, check whether you have:  '\
                                 ' 1. Specified the Web Redirect URL of your App -- The Redirect URL should be <POST URL>/result . '\
                                 ' 2. Configured the base URL of your Phantom Instance at Administration -> Company Settings -> Info'
+
+
+# For encryption and decryption
+MS_AZURE_ENCRYPT_TOKEN = "Encrypting the {} token"
+MS_AZURE_DECRYPT_TOKEN = "Decrypting the {} token"
+MS_AZURE_ENCRYPTION_ERR = "Error occurred while encrypting the state file"
+MS_AZURE_DECRYPTION_ERR = "Error occurred while decrypting the state file"
