@@ -1,2 +1,2 @@
 **Unreleased**
-*Updated the app documentation
+* Updated the app documentation
