@@ -138,7 +138,7 @@ def _save_app_state(state, asset_id, app_connector):
             state_file_obj.write(json.dumps(state))
     except Exception as e:
         if app_connector:
-            app_connector.debug_print('Unable to save state file: {0}'.format(str(e)))
+            app_connector.error_print('Unable to save state file: {0}'.format(str(e)))
 
     return phantom.APP_SUCCESS
 
@@ -312,8 +312,8 @@ class AzureADGraphConnector(BaseConnector):
         try:
             if input_str and self._python_version < 3:
                 input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except Exception:
-            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+        except Exception as e:
+            self.error_print("Error occurred while handling python 2to3 compatibility for the input string. Error: {}".format(e))
 
         return input_str
 
@@ -332,7 +332,8 @@ class AzureADGraphConnector(BaseConnector):
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
-        except Exception:
+        except Exception as e:
+            self.error_print("Error occured while getting message from exeption. Error: {}".format(e))
             pass
 
         if not error_code:
@@ -350,7 +351,7 @@ class AzureADGraphConnector(BaseConnector):
         :return: status phantom.APP_ERROR/phantom.APP_SUCCESS(along with appropriate message)
         """
 
-        if response.status_code == 200 or response.status_code == 202:
+        if response.status_code == 200 or response.status_code == 202 or response.status_code == 204:
             return RetVal(phantom.APP_SUCCESS, {})
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, MS_AZURE_ERR_EMPTY_RESPONSE.format(code=response.status_code)),
@@ -709,8 +710,6 @@ class AzureADGraphConnector(BaseConnector):
         if not completed:
             self.save_progress("Authentication process does not seem to be completed. Timing out")
             return action_result.set_status(phantom.APP_ERROR)
-
-        self.send_progress("")
 
         # Load the state again, since the http request handlers would have saved the result of the admin consent
         self._state = _load_app_state(self.get_asset_id(), self)
@@ -1187,7 +1186,7 @@ class AzureADGraphConnector(BaseConnector):
             try:
                 data['code'] = self.decrypt_state(self._state.get('code'), "code") if self._state.get('code') else None
             except Exception as e:
-                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
+                self.error_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
                 return action_result.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
             data['grant_type'] = 'authorization_code'
 
@@ -1239,9 +1238,9 @@ class AzureADGraphConnector(BaseConnector):
                 parsed_url = urlparse.urlparse(response.get(MS_AZURE_NEXT_LINK_STRING))
                 try:
                     parameters['$skiptoken'] = urlparse.parse_qs(parsed_url.query).get('$skiptoken')[0]
-                except Exception:
-                    self.debug_print("odata.nextLink is {0}".format(response.get(MS_AZURE_NEXT_LINK_STRING)))
-                    self.debug_print("Error occurred while extracting skiptoken from the odata.nextLink")
+                except Exception as e:
+                    self.error_print("odata.nextLink is {0}".format(response.get(MS_AZURE_NEXT_LINK_STRING)))
+                    self.error_print("Error occurred while extracting skiptoken from the odata.nextLink. Error: {}".format(e))
                     break
             else:
                 break
@@ -1342,7 +1341,7 @@ class AzureADGraphConnector(BaseConnector):
             try:
                 self._access_token = self.decrypt_state(self._access_token, "access")
             except Exception as e:
-                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
+                self.error_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
                 return self.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
 
         self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING, None)
@@ -1350,7 +1349,7 @@ class AzureADGraphConnector(BaseConnector):
             try:
                 self._refresh_token = self.decrypt_state(self._refresh_token, "refresh")
             except Exception as e:
-                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
+                self.error_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
                 return self.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
 
         self._base_url = AZUREADGRAPH_API_URLS[config.get(MS_AZURE_URL, "Global")]
@@ -1363,14 +1362,14 @@ class AzureADGraphConnector(BaseConnector):
             if self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING):
                 self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_ACCESS_TOKEN_STRING] = self.encrypt_state(self._access_token, "access")
         except Exception as e:
-            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
+            self.error_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
             return self.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
 
         try:
             if self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING):
                 self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_REFRESH_TOKEN_STRING] = self.encrypt_state(self._refresh_token, "refresh")
         except Exception as e:
-            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
+            self.error_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
             return self.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
 
         if not self._state.get(MS_AZURE_STATE_IS_ENCRYPTED):
@@ -1378,7 +1377,7 @@ class AzureADGraphConnector(BaseConnector):
                 if self._state.get('code'):
                     self._state['code'] = self.encrypt_state(self._state['code'], "code")
             except Exception as e:
-                self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
+                self.error_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
                 return action_result.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
             if self._state.get(MS_AZURE_TOKEN_STRING, {}).get("id_token"):
                 self._state[MS_AZURE_TOKEN_STRING].pop("id_token")

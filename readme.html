@@ -34,12 +34,14 @@ and limitations under the License.
                 <li>User.Read.All</li>
                 <li>Directory.ReadWrite.All</li>
                 <li>Directory.AccessAsUser.All</li>
-                <li>Directory.ReadWrite.All</li>
             </ul>
           </li>
           <li> Click on the <b>Add permissions</b>.</li>
         </ul>
       </ol>
+      <br>
+      <br>
+      <b>Note*</b> You must ensure that the Azure Active Directory user account that will be used during the interactive authentication (described in "Method to Run Test Connectivity below) has a permanently assigned role that has sufficient permissions as Azure provides the option to revoke roles assigned to user accounts automatically at a given frequency.
 
       After making these changes, click on <b>Grant admin consent</b>.
 

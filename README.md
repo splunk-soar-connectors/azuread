@@ -2,11 +2,11 @@
 # Azure AD Graph
 
 Publisher: Splunk  
-Connector Version: 2\.3\.0  
+Connector Version: 2\.3\.1  
 Product Vendor: Microsoft  
 Product Name: Azure AD Graph  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.2\.0  
+Minimum Product Version: 5\.3\.0  
 
 Connects to Azure AD Graph REST API services
 
@@ -46,10 +46,15 @@ Active Directory** .
         -   User.Read.All
         -   Directory.ReadWrite.All
         -   Directory.AccessAsUser.All
-        -   Directory.ReadWrite.All
     -   Click on the **Add permissions** .
 
-After making these changes, click on **Grant admin consent** .
+  
+  
+**Note\*** You must ensure that the Azure Active Directory user account that will be used during the
+interactive authentication (described in "Method to Run Test Connectivity below) has a permanently
+assigned role that has sufficient permissions as Azure provides the option to revoke roles assigned
+to user accounts automatically at a given frequency. After making these changes, click on **Grant
+admin consent** .
 
 ## Configure the Azure AD Graph Phantom app Asset
 
