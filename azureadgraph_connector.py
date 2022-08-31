@@ -332,8 +332,8 @@ class AzureADGraphConnector(BaseConnector):
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
-        except Exception:
-            self.error_print("Error occured while getting message from exeption.")
+        except Exception as e:
+            self.error_print("Error occured while getting message from exeption. Error: {}".format(e))
             pass
 
         if not error_code:
