@@ -9,13 +9,13 @@
     "product_name": "Azure AD Graph",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2022 Splunk Inc.",
+    "license": "Copyright (c) 2019-2023 Splunk Inc.",
     "app_version": "2.3.1",
     "python_version": "3",
     "utctime_updated": "2022-08-31T04:56:45.000000Z",
     "package_name": "phantom_azureadgraph",
     "main_module": "azureadgraph_connector.py",
-    "min_phantom_version": "5.3.0",
+    "min_phantom_version": "5.5.0",
     "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud 2022-01-10, API Version: 1.6"
