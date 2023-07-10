@@ -2,7 +2,7 @@
 # Azure AD Graph
 
 Publisher: Splunk  
-Connector Version: 2.3.1  
+Connector Version: 2.4.0  
 Product Vendor: Microsoft  
 Product Name: Azure AD Graph  
 Product Version Supported (regex): ".\*"  
