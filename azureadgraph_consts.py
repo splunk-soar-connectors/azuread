@@ -63,7 +63,7 @@ MS_AZURE_PAGE_SIZE = 999
 # For authorization code
 TC_FILE = "oauth_task.out"
 SERVER_TOKEN_URL = "https://login.microsoftonline.com/{0}/oauth2/token"
-AUTH_FAILURE_MESSAGES = ("token is invalid", "token has expired", "ExpiredAuthenticationToken", "AuthenticationFailed")
+AUTH_FAILURE_MSGS = ("token is invalid", "token has expired", "ExpiredAuthenticationToken", "AuthenticationFailed")
 MS_REST_URL_NOT_AVAILABLE_MSG = 'Rest URL not available. Error: {error}'
 MS_OAUTH_URL_MSG = 'Using OAuth URL:\n'
 MS_AUTHORIZE_USER_MSG = 'Please authorize user in a separate tab using URL:'
