@@ -325,7 +325,6 @@ class AzureADGraphConnector(BaseConnector):
         error_code = None
         error_msg = ERROR_MSG_UNAVAILABLE
 
-
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
@@ -1323,7 +1322,6 @@ class AzureADGraphConnector(BaseConnector):
                 "app_version": self.get_app_json().get('app_version')
             }
             return self.set_status(phantom.APP_ERROR, MS_AZURE_STATE_FILE_CORRUPT_ERROR)
-        
 
         # Fetching the Python major version
         try:
