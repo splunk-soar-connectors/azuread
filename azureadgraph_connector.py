@@ -582,7 +582,7 @@ class AzureADGraphConnector(BaseConnector):
 
         # If token is expired, generate a new token
         msg = action_result.get_message()
-        
+
         if msg and any(failure_message in msg for failure_message in AUTH_FAILURE_MSGS):
             self.save_progress("bad token")
             ret_val = self._get_token(action_result)
