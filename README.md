@@ -2,16 +2,16 @@
 # Azure AD Graph
 
 Publisher: Splunk  
-Connector Version: 2\.3\.1  
+Connector Version: 2.4.0  
 Product Vendor: Microsoft  
 Product Name: Azure AD Graph  
-Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.3\.0  
+Product Version Supported (regex): ".\*"  
+Minimum Product Version: 6.0.2  
 
 Connects to Azure AD Graph REST API services
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2019-2022 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2023 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
 [comment]: # "you may not use this file except in compliance with the License."
@@ -133,9 +133,9 @@ The below configuration variables are required for this Connector to operate.  T
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
-**tenant\_id** |  required  | string | Tenant \(Tenant ID or Tenant Name\)
-**client\_id** |  required  | string | Application ID
-**client\_secret** |  required  | password | Client Secret
+**tenant_id** |  required  | string | Tenant (Tenant ID or Tenant Name)
+**client_id** |  required  | string | Application ID
+**client_secret** |  required  | password | Client Secret
 **region** |  optional  | string | Azure AD Region
 
 ### Supported Actions  
@@ -174,83 +174,83 @@ List users in a tenant
 Type: **investigate**  
 Read only: **True**
 
-For more information on using the filter\_string parameter, refer to https\://docs\.microsoft\.com/en\-us/previous\-versions/azure/ad/graph/howto/azure\-ad\-graph\-api\-supported\-queries\-filters\-and\-paging\-options\.
+For more information on using the filter_string parameter, refer to https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**filter\_string** |  optional  | Filter string to apply to user listing | string | 
+**filter_string** |  optional  | Filter string to apply to user listing | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.filter\_string | string | 
-action\_result\.data\.\*\.accountEnabled | boolean | 
-action\_result\.data\.\*\.ageGroup | string | 
-action\_result\.data\.\*\.assignedLicenses\.\*\.skuId | string | 
-action\_result\.data\.\*\.assignedPlans\.\*\.assignedTimestamp | string | 
-action\_result\.data\.\*\.assignedPlans\.\*\.capabilityStatus | string | 
-action\_result\.data\.\*\.assignedPlans\.\*\.service | string | 
-action\_result\.data\.\*\.assignedPlans\.\*\.servicePlanId | string | 
-action\_result\.data\.\*\.city | string | 
-action\_result\.data\.\*\.companyName | string | 
-action\_result\.data\.\*\.consentProvidedForMinor | string | 
-action\_result\.data\.\*\.country | string | 
-action\_result\.data\.\*\.createdDateTime | string | 
-action\_result\.data\.\*\.creationType | string | 
-action\_result\.data\.\*\.deletionTimestamp | string | 
-action\_result\.data\.\*\.department | string | 
-action\_result\.data\.\*\.dirSyncEnabled | string | 
-action\_result\.data\.\*\.displayName | string | 
-action\_result\.data\.\*\.employeeId | string | 
-action\_result\.data\.\*\.facsimileTelephoneNumber | string | 
-action\_result\.data\.\*\.givenName | string | 
-action\_result\.data\.\*\.immutableId | string | 
-action\_result\.data\.\*\.isCompromised | string | 
-action\_result\.data\.\*\.jobTitle | string | 
-action\_result\.data\.\*\.lastDirSyncTime | string | 
-action\_result\.data\.\*\.legalAgeGroupClassification | string | 
-action\_result\.data\.\*\.mail | string |  `email` 
-action\_result\.data\.\*\.mailNickname | string | 
-action\_result\.data\.\*\.mobile | string | 
-action\_result\.data\.\*\.objectId | string |  `azure object id` 
-action\_result\.data\.\*\.objectType | string | 
-action\_result\.data\.\*\.odata\.type | string | 
-action\_result\.data\.\*\.onPremisesDistinguishedName | string | 
-action\_result\.data\.\*\.onPremisesSecurityIdentifier | string | 
-action\_result\.data\.\*\.otherMails | string |  `email` 
-action\_result\.data\.\*\.passwordPolicies | string | 
-action\_result\.data\.\*\.passwordProfile | string | 
-action\_result\.data\.\*\.passwordProfile\.enforceChangePasswordPolicy | boolean | 
-action\_result\.data\.\*\.passwordProfile\.forceChangePasswordNextLogin | boolean | 
-action\_result\.data\.\*\.passwordProfile\.password | string | 
-action\_result\.data\.\*\.physicalDeliveryOfficeName | string | 
-action\_result\.data\.\*\.postalCode | string | 
-action\_result\.data\.\*\.preferredLanguage | string | 
-action\_result\.data\.\*\.provisionedPlans\.\*\.capabilityStatus | string | 
-action\_result\.data\.\*\.provisionedPlans\.\*\.provisioningStatus | string | 
-action\_result\.data\.\*\.provisionedPlans\.\*\.service | string | 
-action\_result\.data\.\*\.proxyAddresses | string | 
-action\_result\.data\.\*\.refreshTokensValidFromDateTime | string | 
-action\_result\.data\.\*\.showInAddressList | string | 
-action\_result\.data\.\*\.sipProxyAddress | string |  `email` 
-action\_result\.data\.\*\.state | string | 
-action\_result\.data\.\*\.streetAddress | string | 
-action\_result\.data\.\*\.surname | string | 
-action\_result\.data\.\*\.telephoneNumber | string | 
-action\_result\.data\.\*\.thumbnailPhoto\@odata\.mediaEditLink | string | 
-action\_result\.data\.\*\.usageLocation | string | 
-action\_result\.data\.\*\.userPrincipalName | string |  `email`  `azure user principal name` 
-action\_result\.data\.\*\.userState | string | 
-action\_result\.data\.\*\.userStateChangedOn | string | 
-action\_result\.data\.\*\.userType | string | 
-action\_result\.summary\.num\_users | numeric | 
-action\_result\.summary\.result\_found | boolean | 
-action\_result\.summary\.total\_results | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.filter_string | string |  |   startswith(displayName,'User') 
+action_result.data.\*.accountEnabled | boolean |  |   True  False 
+action_result.data.\*.ageGroup | string |  |  
+action_result.data.\*.assignedLicenses.\*.skuId | string |  |   189a915c-fe4f-4ffa-bde4-85b9628d07a0 
+action_result.data.\*.assignedPlans.\*.assignedTimestamp | string |  |   2017-08-29T02:31:40Z 
+action_result.data.\*.assignedPlans.\*.capabilityStatus | string |  |   Enabled 
+action_result.data.\*.assignedPlans.\*.service | string |  |   OfficeForms 
+action_result.data.\*.assignedPlans.\*.servicePlanId | string |  |   e212cbc7-0961-4c40-9825-01117710dcb1 
+action_result.data.\*.city | string |  |   Palo Alto 
+action_result.data.\*.companyName | string |  |  
+action_result.data.\*.consentProvidedForMinor | string |  |  
+action_result.data.\*.country | string |  |   US 
+action_result.data.\*.createdDateTime | string |  |   2019-05-21T22:27:20Z 
+action_result.data.\*.creationType | string |  |  
+action_result.data.\*.deletionTimestamp | string |  |  
+action_result.data.\*.department | string |  |   Sales 
+action_result.data.\*.dirSyncEnabled | string |  |  
+action_result.data.\*.displayName | string |  |   User 
+action_result.data.\*.employeeId | string |  |  
+action_result.data.\*.facsimileTelephoneNumber | string |  |  
+action_result.data.\*.givenName | string |  |   testuser 
+action_result.data.\*.immutableId | string |  |  
+action_result.data.\*.isCompromised | string |  |  
+action_result.data.\*.jobTitle | string |  |   Sales Manager 
+action_result.data.\*.lastDirSyncTime | string |  |  
+action_result.data.\*.legalAgeGroupClassification | string |  |  
+action_result.data.\*.mail | string |  `email`  |   user@test.onmicrosoft.com 
+action_result.data.\*.mailNickname | string |  |   testmail 
+action_result.data.\*.mobile | string |  |   +1 5556378688 
+action_result.data.\*.objectId | string |  `azure object id`  |   e4c722ac-3b83-478d-8f52-c388885dc30f 
+action_result.data.\*.objectType | string |  |   User 
+action_result.data.\*.odata.type | string |  |   Microsoft.DirectoryServices.User 
+action_result.data.\*.onPremisesDistinguishedName | string |  |  
+action_result.data.\*.onPremisesSecurityIdentifier | string |  |  
+action_result.data.\*.otherMails | string |  `email`  |   user.test@outlook.com 
+action_result.data.\*.passwordPolicies | string |  |   None 
+action_result.data.\*.passwordProfile | string |  |  
+action_result.data.\*.passwordProfile.enforceChangePasswordPolicy | boolean |  |   True  False 
+action_result.data.\*.passwordProfile.forceChangePasswordNextLogin | boolean |  |   True  False 
+action_result.data.\*.passwordProfile.password | string |  |  
+action_result.data.\*.physicalDeliveryOfficeName | string |  |  
+action_result.data.\*.postalCode | string |  |   94303 
+action_result.data.\*.preferredLanguage | string |  |   en-US 
+action_result.data.\*.provisionedPlans.\*.capabilityStatus | string |  |   Enabled 
+action_result.data.\*.provisionedPlans.\*.provisioningStatus | string |  |   Success 
+action_result.data.\*.provisionedPlans.\*.service | string |  |   exchange 
+action_result.data.\*.proxyAddresses | string |  |   SMTP:user1@test.onmicrosoft.com 
+action_result.data.\*.refreshTokensValidFromDateTime | string |  |   2017-09-27T22:54:59Z 
+action_result.data.\*.showInAddressList | string |  |  
+action_result.data.\*.sipProxyAddress | string |  `email`  |   user@test.onmicrosoft.com 
+action_result.data.\*.state | string |  |   CA 
+action_result.data.\*.streetAddress | string |  |   2479 E. Bayshore Rd. 
+action_result.data.\*.surname | string |  |   Test_surname 
+action_result.data.\*.telephoneNumber | string |  |  
+action_result.data.\*.thumbnailPhoto@odata.mediaEditLink | string |  |   directoryObjects/6132ca31-7a09-434f-a269-abe836d0c01e/Microsoft.DirectoryServices.User/thumbnailPhoto 
+action_result.data.\*.usageLocation | string |  |   US 
+action_result.data.\*.userPrincipalName | string |  `email`  `azure user principal name`  |   user@test.onmicrosoft.com 
+action_result.data.\*.userState | string |  |  
+action_result.data.\*.userStateChangedOn | string |  |  
+action_result.data.\*.userType | string |  |   Member 
+action_result.summary.num_users | numeric |  |   8 
+action_result.summary.result_found | boolean |  |   True  False 
+action_result.summary.total_results | numeric |  |   7 
+action_result.message | string |  |   Successfully listed users 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'reset password'
 Reset or set a user's password in an Azure AD environment
@@ -261,22 +261,22 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**user\_id** |  required  | User ID to change password \- can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
-**force\_change** |  optional  | Force user to change password on next login | boolean | 
-**temp\_password** |  required  | Temporary password for user | string | 
+**user_id** |  required  | User ID to change password - can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
+**force_change** |  optional  | Force user to change password on next login | boolean | 
+**temp_password** |  required  | Temporary password for user | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.force\_change | boolean | 
-action\_result\.parameter\.temp\_password | string | 
-action\_result\.parameter\.user\_id | string |  `azure user principal name`  `azure object id`  `email` 
-action\_result\.data | string | 
-action\_result\.summary\.status | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.force_change | boolean |  |   True  False 
+action_result.parameter.temp_password | string |  |   Temp_PA$$w0rd 
+action_result.parameter.user_id | string |  `azure user principal name`  `azure object id`  `email`  |   ee3dc4f2-70f9-446f-a19e-6b4e95ba030d  user@test.onmicrosoft.com 
+action_result.data | string |  |  
+action_result.summary.status | string |  |   Successfully reset user password 
+action_result.message | string |  |   Status: Successfully reset user password 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'disable tokens'
 Invalidate all active refresh tokens for a user in an Azure AD environment
@@ -287,21 +287,21 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**user\_id** |  required  | User ID to disable tokens of \- can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
+**user_id** |  required  | User ID to disable tokens of - can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.user\_id | string |  `azure user principal name`  `azure object id`  `email` 
-action\_result\.data | string | 
-action\_result\.data\.\*\.odata\.metadata | string |  `url` 
-action\_result\.data\.\*\.odata\.null | boolean | 
-action\_result\.data\.\*\.value | boolean | 
-action\_result\.summary\.status | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.user_id | string |  `azure user principal name`  `azure object id`  `email`  |   ee3dc4f2-70f9-446f-a19e-6b4e95ba030d  user@test.onmicrosoft.com 
+action_result.data | string |  |  
+action_result.data.\*.odata.metadata | string |  `url`  |   https://graph.windows.net/1t309est-db6c-4tes-t1d2-12bf3456d78d/$metadata#Edm.Null 
+action_result.data.\*.odata.null | boolean |  |   True  False 
+action_result.data.\*.value | boolean |  |   True  False 
+action_result.summary.status | string |  |   Successfully disabled tokens 
+action_result.message | string |  |   Status: Successfully disabled tokens 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'enable user'
 Enable a user
@@ -312,18 +312,18 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**user\_id** |  required  | User ID to enable tokens of \- can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
+**user_id** |  required  | User ID to enable tokens of - can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.user\_id | string |  `azure user principal name`  `azure object id`  `email` 
-action\_result\.data | string | 
-action\_result\.summary\.status | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.user_id | string |  `azure user principal name`  `azure object id`  `email`  |   user@test.onmicrosoft.com 
+action_result.data | string |  |  
+action_result.summary.status | string |  |   Successfully enabled user user@test.onmicrosoft.com 
+action_result.message | string |  |   Status: Successfully enabled user user@test.onmicrosoft.com 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'disable user'
 Disable a user
@@ -334,18 +334,18 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**user\_id** |  required  | User ID to change password \- can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
+**user_id** |  required  | User ID to change password - can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.user\_id | string |  `azure user principal name`  `azure object id`  `email` 
-action\_result\.data | string | 
-action\_result\.summary\.status | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.user_id | string |  `azure user principal name`  `azure object id`  `email`  |   user@test.onmicrosoft.com 
+action_result.data | string |  |  
+action_result.summary.status | string |  |   Successfully disabled user user@test.onmicrosoft.com 
+action_result.message | string |  |   Status: Successfully disabled user user@test.onmicrosoft.com 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list user attributes'
 List attributes for all or a specified user
@@ -356,78 +356,78 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**user\_id** |  optional  | User ID \- can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
+**user_id** |  optional  | User ID - can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.user\_id | string |  `azure user principal name`  `azure object id`  `email` 
-action\_result\.data\.\*\.accountEnabled | boolean | 
-action\_result\.data\.\*\.ageGroup | string | 
-action\_result\.data\.\*\.assignedLicenses\.\*\.skuId | string | 
-action\_result\.data\.\*\.assignedPlans\.\*\.assignedTimestamp | string | 
-action\_result\.data\.\*\.assignedPlans\.\*\.capabilityStatus | string | 
-action\_result\.data\.\*\.assignedPlans\.\*\.service | string | 
-action\_result\.data\.\*\.assignedPlans\.\*\.servicePlanId | string | 
-action\_result\.data\.\*\.city | string | 
-action\_result\.data\.\*\.companyName | string | 
-action\_result\.data\.\*\.consentProvidedForMinor | string | 
-action\_result\.data\.\*\.country | string | 
-action\_result\.data\.\*\.createdDateTime | string | 
-action\_result\.data\.\*\.creationType | string | 
-action\_result\.data\.\*\.deletionTimestamp | string | 
-action\_result\.data\.\*\.department | string | 
-action\_result\.data\.\*\.dirSyncEnabled | string | 
-action\_result\.data\.\*\.displayName | string | 
-action\_result\.data\.\*\.employeeId | string | 
-action\_result\.data\.\*\.facsimileTelephoneNumber | string | 
-action\_result\.data\.\*\.givenName | string | 
-action\_result\.data\.\*\.immutableId | string | 
-action\_result\.data\.\*\.isCompromised | string | 
-action\_result\.data\.\*\.jobTitle | string | 
-action\_result\.data\.\*\.lastDirSyncTime | string | 
-action\_result\.data\.\*\.legalAgeGroupClassification | string | 
-action\_result\.data\.\*\.mail | string |  `email` 
-action\_result\.data\.\*\.mailNickname | string | 
-action\_result\.data\.\*\.mobile | string | 
-action\_result\.data\.\*\.objectId | string | 
-action\_result\.data\.\*\.objectType | string | 
-action\_result\.data\.\*\.odata\.metadata | string | 
-action\_result\.data\.\*\.odata\.type | string | 
-action\_result\.data\.\*\.onPremisesDistinguishedName | string | 
-action\_result\.data\.\*\.onPremisesSecurityIdentifier | string | 
-action\_result\.data\.\*\.otherMails | string |  `email` 
-action\_result\.data\.\*\.passwordPolicies | string | 
-action\_result\.data\.\*\.passwordProfile | string | 
-action\_result\.data\.\*\.passwordProfile\.enforceChangePasswordPolicy | boolean | 
-action\_result\.data\.\*\.passwordProfile\.forceChangePasswordNextLogin | boolean | 
-action\_result\.data\.\*\.passwordProfile\.password | string | 
-action\_result\.data\.\*\.physicalDeliveryOfficeName | string | 
-action\_result\.data\.\*\.postalCode | string | 
-action\_result\.data\.\*\.preferredLanguage | string | 
-action\_result\.data\.\*\.provisionedPlans\.\*\.capabilityStatus | string | 
-action\_result\.data\.\*\.provisionedPlans\.\*\.provisioningStatus | string | 
-action\_result\.data\.\*\.provisionedPlans\.\*\.service | string | 
-action\_result\.data\.\*\.proxyAddresses | string | 
-action\_result\.data\.\*\.refreshTokensValidFromDateTime | string | 
-action\_result\.data\.\*\.showInAddressList | string | 
-action\_result\.data\.\*\.sipProxyAddress | string |  `email` 
-action\_result\.data\.\*\.state | string | 
-action\_result\.data\.\*\.streetAddress | string | 
-action\_result\.data\.\*\.surname | string | 
-action\_result\.data\.\*\.telephoneNumber | string | 
-action\_result\.data\.\*\.thumbnailPhoto\@odata\.mediaEditLink | string | 
-action\_result\.data\.\*\.usageLocation | string | 
-action\_result\.data\.\*\.userPrincipalName | string |  `email` 
-action\_result\.data\.\*\.userState | string | 
-action\_result\.data\.\*\.userStateChangedOn | string | 
-action\_result\.data\.\*\.userType | string | 
-action\_result\.summary\.status | string | 
-action\_result\.summary\.user\_enabled | boolean | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.user_id | string |  `azure user principal name`  `azure object id`  `email`  |   user@test.onmicrosoft.com 
+action_result.data.\*.accountEnabled | boolean |  |   True  False 
+action_result.data.\*.ageGroup | string |  |  
+action_result.data.\*.assignedLicenses.\*.skuId | string |  |   f30db892-07e9-47e9-837c-80727f46fd3d 
+action_result.data.\*.assignedPlans.\*.assignedTimestamp | string |  |   2019-04-26T07:21:18Z 
+action_result.data.\*.assignedPlans.\*.capabilityStatus | string |  |   Enabled 
+action_result.data.\*.assignedPlans.\*.service | string |  |   exchange 
+action_result.data.\*.assignedPlans.\*.servicePlanId | string |  |   33c4f319-9bdd-48d6-9c4d-410b750a4a5a 
+action_result.data.\*.city | string |  |  
+action_result.data.\*.companyName | string |  |  
+action_result.data.\*.consentProvidedForMinor | string |  |  
+action_result.data.\*.country | string |  |  
+action_result.data.\*.createdDateTime | string |  |   2019-05-02T20:27:59Z 
+action_result.data.\*.creationType | string |  |  
+action_result.data.\*.deletionTimestamp | string |  |  
+action_result.data.\*.department | string |  |   Sales 
+action_result.data.\*.dirSyncEnabled | string |  |  
+action_result.data.\*.displayName | string |  |   Luke Skywalker 
+action_result.data.\*.employeeId | string |  |  
+action_result.data.\*.facsimileTelephoneNumber | string |  |  
+action_result.data.\*.givenName | string |  |  
+action_result.data.\*.immutableId | string |  |  
+action_result.data.\*.isCompromised | string |  |  
+action_result.data.\*.jobTitle | string |  |  
+action_result.data.\*.lastDirSyncTime | string |  |  
+action_result.data.\*.legalAgeGroupClassification | string |  |  
+action_result.data.\*.mail | string |  `email`  |  
+action_result.data.\*.mailNickname | string |  |   test 
+action_result.data.\*.mobile | string |  |  
+action_result.data.\*.objectId | string |  |   59f51194-1998-4932-a8ac-468e59374edc 
+action_result.data.\*.objectType | string |  |   User 
+action_result.data.\*.odata.metadata | string |  |  
+action_result.data.\*.odata.type | string |  |   Microsoft.DirectoryServices.User 
+action_result.data.\*.onPremisesDistinguishedName | string |  |  
+action_result.data.\*.onPremisesSecurityIdentifier | string |  |  
+action_result.data.\*.otherMails | string |  `email`  |   user@test.com 
+action_result.data.\*.passwordPolicies | string |  |  
+action_result.data.\*.passwordProfile | string |  |  
+action_result.data.\*.passwordProfile.enforceChangePasswordPolicy | boolean |  |   True  False 
+action_result.data.\*.passwordProfile.forceChangePasswordNextLogin | boolean |  |   True  False 
+action_result.data.\*.passwordProfile.password | string |  |  
+action_result.data.\*.physicalDeliveryOfficeName | string |  |  
+action_result.data.\*.postalCode | string |  |  
+action_result.data.\*.preferredLanguage | string |  |  
+action_result.data.\*.provisionedPlans.\*.capabilityStatus | string |  |   Enabled 
+action_result.data.\*.provisionedPlans.\*.provisioningStatus | string |  |   Success 
+action_result.data.\*.provisionedPlans.\*.service | string |  |   exchange 
+action_result.data.\*.proxyAddresses | string |  |   SMTP:test_shared_mailbox@test.onmicrosoft.com 
+action_result.data.\*.refreshTokensValidFromDateTime | string |  |   2019-05-16T19:54:18Z 
+action_result.data.\*.showInAddressList | string |  |  
+action_result.data.\*.sipProxyAddress | string |  `email`  |  
+action_result.data.\*.state | string |  |  
+action_result.data.\*.streetAddress | string |  |  
+action_result.data.\*.surname | string |  |  
+action_result.data.\*.telephoneNumber | string |  |  
+action_result.data.\*.thumbnailPhoto@odata.mediaEditLink | string |  |   directoryObjects/59f51194-1998-4932-a8ac-468e59374edc/Microsoft.DirectoryServices.User/thumbnailPhoto 
+action_result.data.\*.usageLocation | string |  |   US 
+action_result.data.\*.userPrincipalName | string |  `email`  |   user@test.onmicrosoft.com 
+action_result.data.\*.userState | string |  |  
+action_result.data.\*.userStateChangedOn | string |  |  
+action_result.data.\*.userType | string |  |   Member 
+action_result.summary.status | string |  |   Successfully retrieved attributes for user user@test.onmicrosoft.com 
+action_result.summary.user_enabled | boolean |  |   True  False 
+action_result.message | string |  |   Status: Successfully retrieved attributes for user user@test.onmicrosoft.com, User enabled: False 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'set user attribute'
 Set an attribute for a user
@@ -438,22 +438,22 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**user\_id** |  required  | User ID \- can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
+**user_id** |  required  | User ID - can be user principal name or object ID | string |  `azure user principal name`  `azure object id`  `email` 
 **attribute** |  required  | Attribute to set | string | 
-**attribute\_value** |  required  | Value of attribute to set | string | 
+**attribute_value** |  required  | Value of attribute to set | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.attribute | string | 
-action\_result\.parameter\.attribute\_value | string | 
-action\_result\.parameter\.user\_id | string |  `azure user principal name`  `azure object id`  `email` 
-action\_result\.data | string | 
-action\_result\.summary\.status | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.attribute | string |  |   department 
+action_result.parameter.attribute_value | string |  |   Sales 
+action_result.parameter.user_id | string |  `azure user principal name`  `azure object id`  `email`  |   user@test.onmicrosoft.com 
+action_result.data | string |  |  
+action_result.summary.status | string |  |   Successfully enabled user user@test.onmicrosoft.com 
+action_result.message | string |  |   Status: Successfully enabled user user@test.onmicrosoft.com 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'remove user'
 Remove a user from a specified group
@@ -464,20 +464,20 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**group\_object\_id** |  required  | Object ID of group | string |  `azure group object id` 
-**user\_id** |  required  | User ID to remove from group | string |  `azure user principal name`  `azure object id`  `email` 
+**group_object_id** |  required  | Object ID of group | string |  `azure group object id` 
+**user_id** |  required  | User ID to remove from group | string |  `azure user principal name`  `azure object id`  `email` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.group\_object\_id | string |  `azure group object id` 
-action\_result\.parameter\.user\_id | string |  `azure user principal name`  `azure object id`  `email` 
-action\_result\.data | string | 
-action\_result\.summary\.status | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.group_object_id | string |  `azure group object id`  |   ddb876b3-603a-437b-9814-2d46a2219a1e 
+action_result.parameter.user_id | string |  `azure user principal name`  `azure object id`  `email`  |   17be76d0-35ed-4881-ab62-d2eb73c2ebe3 
+action_result.data | string |  |  
+action_result.summary.status | string |  |   Successfully removed user from group 
+action_result.message | string |  |   Status: Successfully removed user from group 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'add user'
 Add a user to the tenant by creating an organizational account
@@ -488,20 +488,20 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**group\_object\_id** |  required  | Object ID of group | string |  `azure group object id` 
-**user\_id** |  required  | User ID to add to group | string |  `azure object id` 
+**group_object_id** |  required  | Object ID of group | string |  `azure group object id` 
+**user_id** |  required  | User ID to add to group | string |  `azure object id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.group\_object\_id | string |  `azure group object id` 
-action\_result\.parameter\.user\_id | string |  `azure object id` 
-action\_result\.data | string | 
-action\_result\.summary\.status | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.group_object_id | string |  `azure group object id`  |   ddb876b3-603a-437b-9814-2d46a2219a1e 
+action_result.parameter.user_id | string |  `azure object id`  |   17be76d0-35ed-4881-ab62-d2eb73c2ebe3 
+action_result.data | string |  |  
+action_result.summary.status | string |  |   Successfully added user to group 
+action_result.message | string |  |   Status: Successfully added user to group 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list groups'
 List groups in the organization
@@ -513,30 +513,30 @@ Read only: **True**
 No parameters are required for this action
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.data\.\*\.deletionTimestamp | string | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.dirSyncEnabled | string | 
-action\_result\.data\.\*\.displayName | string | 
-action\_result\.data\.\*\.lastDirSyncTime | string | 
-action\_result\.data\.\*\.mail | string |  `email` 
-action\_result\.data\.\*\.mailEnabled | boolean | 
-action\_result\.data\.\*\.mailNickname | string | 
-action\_result\.data\.\*\.objectId | string |  `azure object id` 
-action\_result\.data\.\*\.objectType | string | 
-action\_result\.data\.\*\.odata\.type | string | 
-action\_result\.data\.\*\.onPremisesDomainName | string |  `domain` 
-action\_result\.data\.\*\.onPremisesNetBiosName | string | 
-action\_result\.data\.\*\.onPremisesSamAccountName | string | 
-action\_result\.data\.\*\.onPremisesSecurityIdentifier | string | 
-action\_result\.data\.\*\.proxyAddresses | string | 
-action\_result\.data\.\*\.securityEnabled | boolean | 
-action\_result\.summary\.num\_groups | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.deletionTimestamp | string |  |  
+action_result.data.\*.description | string |  |   This is for testing purpose 
+action_result.data.\*.dirSyncEnabled | string |  |  
+action_result.data.\*.displayName | string |  |   Test-site 
+action_result.data.\*.lastDirSyncTime | string |  |  
+action_result.data.\*.mail | string |  `email`  |   Test-site@test.onmicrosoft.com 
+action_result.data.\*.mailEnabled | boolean |  |   True  False 
+action_result.data.\*.mailNickname | string |  |   Test-site 
+action_result.data.\*.objectId | string |  `azure object id`  |   2a201c95-101b-42d9-a7af-9a2fdf8193f1 
+action_result.data.\*.objectType | string |  |   Group 
+action_result.data.\*.odata.type | string |  |   Microsoft.DirectoryServices.Group 
+action_result.data.\*.onPremisesDomainName | string |  `domain`  |  
+action_result.data.\*.onPremisesNetBiosName | string |  |  
+action_result.data.\*.onPremisesSamAccountName | string |  |  
+action_result.data.\*.onPremisesSecurityIdentifier | string |  |  
+action_result.data.\*.proxyAddresses | string |  |   SMTP:test-h@test.onmicrosoft.com 
+action_result.data.\*.securityEnabled | boolean |  |   True  False 
+action_result.summary.num_groups | numeric |  |   7 
+action_result.message | string |  |   Num groups: 7 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get group'
 Get information about a group
@@ -547,35 +547,35 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**object\_id** |  required  | Object ID of group | string |  `azure object id` 
+**object_id** |  required  | Object ID of group | string |  `azure object id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.object\_id | string |  `azure object id` 
-action\_result\.data\.\*\.deletionTimestamp | string | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.dirSyncEnabled | string | 
-action\_result\.data\.\*\.displayName | string | 
-action\_result\.data\.\*\.lastDirSyncTime | string | 
-action\_result\.data\.\*\.mail | string |  `email` 
-action\_result\.data\.\*\.mailEnabled | boolean | 
-action\_result\.data\.\*\.mailNickname | string | 
-action\_result\.data\.\*\.objectId | string |  `azure object id` 
-action\_result\.data\.\*\.objectType | string | 
-action\_result\.data\.\*\.odata\.metadata | string | 
-action\_result\.data\.\*\.odata\.type | string | 
-action\_result\.data\.\*\.onPremisesDomainName | string |  `domain` 
-action\_result\.data\.\*\.onPremisesNetBiosName | string | 
-action\_result\.data\.\*\.onPremisesSamAccountName | string | 
-action\_result\.data\.\*\.onPremisesSecurityIdentifier | string | 
-action\_result\.data\.\*\.proxyAddresses | string | 
-action\_result\.data\.\*\.securityEnabled | boolean | 
-action\_result\.summary\.display\_name | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.object_id | string |  `azure object id`  |   ddb876b3-603a-437b-9814-2d46a2219a1e 
+action_result.data.\*.deletionTimestamp | string |  |  
+action_result.data.\*.description | string |  |   This is the office 365 group 
+action_result.data.\*.dirSyncEnabled | string |  |  
+action_result.data.\*.displayName | string |  |   o365group 
+action_result.data.\*.lastDirSyncTime | string |  |  
+action_result.data.\*.mail | string |  `email`  |   bc7f9cabe@test.onmicrosoft.com 
+action_result.data.\*.mailEnabled | boolean |  |   True  False 
+action_result.data.\*.mailNickname | string |  |   bc7f9cabe 
+action_result.data.\*.objectId | string |  `azure object id`  |   ddb876b3-603a-437b-9814-2d46a2219a1e 
+action_result.data.\*.objectType | string |  |   Group 
+action_result.data.\*.odata.metadata | string |  |   https://graph.windows.net/1t309est-db6c-4tes-t1d2-12bf3456d78d/$metadata#directoryObjects/@Element 
+action_result.data.\*.odata.type | string |  |   Microsoft.DirectoryServices.Group 
+action_result.data.\*.onPremisesDomainName | string |  `domain`  |  
+action_result.data.\*.onPremisesNetBiosName | string |  |  
+action_result.data.\*.onPremisesSamAccountName | string |  |  
+action_result.data.\*.onPremisesSecurityIdentifier | string |  |  
+action_result.data.\*.proxyAddresses | string |  |   SMTP:bc7f9cabe@test.onmicrosoft.com 
+action_result.data.\*.securityEnabled | boolean |  |   True  False 
+action_result.summary.display_name | string |  |   o365group 
+action_result.message | string |  |   Display name: o365group 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list group members'
 List the members in a group
@@ -583,24 +583,24 @@ List the members in a group
 Type: **investigate**  
 Read only: **True**
 
-<p>Pagination is not implemented for this action as this endpoint does not support pagination\. Here is the <b><a href='https\://docs\.microsoft\.com/en\-us/previous\-versions/azure/ad/graph/howto/azure\-ad\-graph\-api\-supported\-queries\-filters\-and\-paging\-options' target='\_blank'>Documentation</a></b> for the same\.</p>
+<p>Pagination is not implemented for this action as this endpoint does not support pagination. Here is the <b><a href='https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options' target='_blank'>Documentation</a></b> for the same.</p>
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**group\_object\_id** |  required  | Object ID of group | string |  `azure object id` 
+**group_object_id** |  required  | Object ID of group | string |  `azure object id` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.group\_object\_id | string |  `azure object id` 
-action\_result\.data\.\*\.displayName | string | 
-action\_result\.data\.\*\.objectId | string |  `azure object id` 
-action\_result\.summary\.num\_members | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.group_object_id | string |  `azure object id`  |   ebcd3130-55a1-4cbf-81b2-86408ff21203 
+action_result.data.\*.displayName | string |  |   Firstname Lastname 
+action_result.data.\*.objectId | string |  `azure object id`  |   17be76d0-35ed-4881-ab62-d2eb73c2ebe3 
+action_result.summary.num_members | numeric |  |   3 
+action_result.message | string |  |   Num members: 3 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'validate group'
 Returns true if a user is in a group; otherwise, false
@@ -611,20 +611,20 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**group\_object\_id** |  required  | Object ID of group | string |  `azure group object id` 
-**user\_id** |  required  | User ID to validate | string |  `azure user principal name`  `azure object id`  `email` 
+**group_object_id** |  required  | Object ID of group | string |  `azure group object id` 
+**user_id** |  required  | User ID to validate | string |  `azure user principal name`  `azure object id`  `email` 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.group\_object\_id | string |  `azure group object id` 
-action\_result\.parameter\.user\_id | string |  `azure user principal name`  `azure object id`  `email` 
-action\_result\.data\.\*\.user\_in\_group | boolean | 
-action\_result\.summary\.user\_in\_group | boolean | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.group_object_id | string |  `azure group object id`  |   ebcd3130-55a1-4cbf-81b2-86408ff21203 
+action_result.parameter.user_id | string |  `azure user principal name`  `azure object id`  `email`  |   user@test.onmicrosoft.com 
+action_result.data.\*.user_in_group | boolean |  |   True  False 
+action_result.summary.user_in_group | boolean |  |   True  False 
+action_result.message | string |  |   User in group: True 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'list directory roles'
 List the directory roles in a tenant
@@ -632,28 +632,28 @@ List the directory roles in a tenant
 Type: **investigate**  
 Read only: **True**
 
-<p>Pagination is not implemented for this action as this endpoint does not support pagination\. Here is the <b><a href='https\://docs\.microsoft\.com/en\-us/previous\-versions/azure/ad/graph/howto/azure\-ad\-graph\-api\-supported\-queries\-filters\-and\-paging\-options' target='\_blank'>Documentation</a></b> for the same\.</p>
+<p>Pagination is not implemented for this action as this endpoint does not support pagination. Here is the <b><a href='https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options' target='_blank'>Documentation</a></b> for the same.</p>
 
 #### Action Parameters
 No parameters are required for this action
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.data\.\*\.deletionTimestamp | string | 
-action\_result\.data\.\*\.description | string | 
-action\_result\.data\.\*\.displayName | string | 
-action\_result\.data\.\*\.isSystem | boolean | 
-action\_result\.data\.\*\.objectId | string |  `azure object id` 
-action\_result\.data\.\*\.objectType | string | 
-action\_result\.data\.\*\.odata\.type | string | 
-action\_result\.data\.\*\.roleDisabled | boolean | 
-action\_result\.data\.\*\.roleTemplateId | string |  `azure role template id` 
-action\_result\.summary\.num\_directory\_roles | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data.\*.deletionTimestamp | string |  |  
+action_result.data.\*.description | string |  |   Can read basic directory information. For granting access to applications, not intended for users. 
+action_result.data.\*.displayName | string |  |   Directory Readers 
+action_result.data.\*.isSystem | boolean |  |   True  False 
+action_result.data.\*.objectId | string |  `azure object id`  |   02b238cb-0d15-454b-aae6-0e94993a3207 
+action_result.data.\*.objectType | string |  |   Role 
+action_result.data.\*.odata.type | string |  |   Microsoft.DirectoryServices.DirectoryRole 
+action_result.data.\*.roleDisabled | boolean |  |   True  False 
+action_result.data.\*.roleTemplateId | string |  `azure role template id`  |   88d8e3e3-8f55-4a1e-953a-9b9898b8876b 
+action_result.summary.num_directory_roles | numeric |  |   9 
+action_result.message | string |  |   Num directory roles: 9 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'generate token'
 Generate a token or regenerates token when the token expires
@@ -665,11 +665,11 @@ Read only: **False**
 No parameters are required for this action
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric | 
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Token generated 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1 
