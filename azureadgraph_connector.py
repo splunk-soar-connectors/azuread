@@ -1163,7 +1163,7 @@ class AzureADGraphConnector(BaseConnector):
             try:
                 data['code'] = self.decrypt_state(self._state.get('code'), "code") if self._state.get('code') else None
             except Exception as e:
-                self.error_print("{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
+                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
                 return action_result.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERROR)
             data['grant_type'] = 'authorization_code'
 
@@ -1312,7 +1312,7 @@ class AzureADGraphConnector(BaseConnector):
             try:
                 self._access_token = self.decrypt_state(self._access_token, "access")
             except Exception as e:
-                self.error_print("{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
+                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
                 self._access_token = None
 
         self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING, None)
@@ -1320,7 +1320,7 @@ class AzureADGraphConnector(BaseConnector):
             try:
                 self._refresh_token = self.decrypt_state(self._refresh_token, "refresh")
             except Exception as e:
-                self.error_print("{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
+                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
                 self._refresh_token = None
 
         self._base_url = AZUREADGRAPH_API_URLS[config.get(MS_AZURE_URL, "Global")]
@@ -1333,14 +1333,14 @@ class AzureADGraphConnector(BaseConnector):
             if self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING):
                 self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_ACCESS_TOKEN_STRING] = self.encrypt_state(self._access_token, "access")
         except Exception as e:
-            self.error_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERROR, self._get_error_message_from_exception(e)))
+            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERROR, self._get_error_message_from_exception(e)))
             self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_ACCESS_TOKEN_STRING] = None
 
         try:
             if self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING):
                 self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_REFRESH_TOKEN_STRING] = self.encrypt_state(self._refresh_token, "refresh")
         except Exception as e:
-            self.error_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERROR, self._get_error_message_from_exception(e)))
+            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERROR, self._get_error_message_from_exception(e)))
             self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_REFRESH_TOKEN_STRING] = None
 
         if not self._state.get(MS_AZURE_STATE_IS_ENCRYPTED):
@@ -1348,7 +1348,7 @@ class AzureADGraphConnector(BaseConnector):
                 if self._state.get('code'):
                     self._state['code'] = self.encrypt_state(self._state['code'], "code")
             except Exception as e:
-                self.error_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERROR, self._get_error_message_from_exception(e)))
+                self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERROR, self._get_error_message_from_exception(e)))
                 self._state['code'] = None
             if self._state.get(MS_AZURE_TOKEN_STRING, {}).get("id_token"):
                 self._state[MS_AZURE_TOKEN_STRING].pop("id_token")
