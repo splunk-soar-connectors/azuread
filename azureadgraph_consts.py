@@ -54,7 +54,7 @@ MS_AZURE_BASE_URL_NOT_FOUND_MSG = 'Phantom Base URL not found in System Settings
                                 'Please specify this value in System Settings.'
 MS_AZURE_HTML_ERROR = 'Bad Request Bad Request - Invalid URL HTTP Error 400. The request URL is invalid.'
 MS_AZURE_ERROR_EMPTY_RESPONSE = "Status Code {code}. Empty response and no information in the header."
-ERROR_MSG_UNAVAILABLE = "Error message unavailable. Please check the asset configuration and|or action parameters."
+ERROR_MSG_UNAVAILABLE = "Error msg unavailable. Please check the asset configuration and|or action parameters."
 MS_AZURE_STATE_FILE_CORRUPT_ERROR = "Error occurred while loading the state file due to its unexpected format. " \
     "Resetting the state file with the default format. Please run the test connectivity once."
 MS_AZURE_NEXT_LINK_STRING = 'odata.nextLink'
@@ -63,7 +63,7 @@ MS_AZURE_PAGE_SIZE = 999
 # For authorization code
 TC_FILE = "oauth_task.out"
 SERVER_TOKEN_URL = "https://login.microsoftonline.com/{0}/oauth2/token"
-AUTH_FAILURE_MSG = ("token is invalid", "token has expired", "ExpiredAuthenticationToken", "AuthenticationFailed")
+AUTH_FAILURE_MSGS = ("token is invalid", "token has expired", "ExpiredAuthenticationToken", "AuthenticationFailed")
 MS_REST_URL_NOT_AVAILABLE_MSG = 'Rest URL not available. Error: {error}'
 MS_OAUTH_URL_MSG = 'Using OAuth URL:\n'
 MS_AUTHORIZE_USER_MSG = 'Please authorize user in a separate tab using URL:'

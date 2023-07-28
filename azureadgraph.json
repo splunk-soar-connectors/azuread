@@ -10,15 +10,15 @@
     "product_version_regex": ".*",
     "publisher": "Splunk",
     "license": "Copyright (c) 2019-2023 Splunk Inc.",
-    "app_version": "2.3.2",
+    "app_version": "2.4.0",
     "python_version": "3",
     "utctime_updated": "2022-08-31T04:56:45.000000Z",
     "package_name": "phantom_azureadgraph",
     "main_module": "azureadgraph_connector.py",
-    "min_phantom_version": "5.3.0",
+    "min_phantom_version": "6.0.2",
     "fips_compliant": true,
     "latest_tested_versions": [
-        "Cloud 2022-01-10, API Version: 1.6"
+        "Cloud 2023-06-10, API Version: 1.6"
     ],
     "app_wizard_version": "1.0.0",
     "rest_handler": "azureadgraph_connector._handle_rest_request",
