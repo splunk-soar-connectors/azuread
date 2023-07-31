@@ -1,6 +1,6 @@
 # File: azureadgraph_connector.py
 #
-# Copyright (c) 2019-2022 Splunk Inc.
+# Copyright (c) 2019-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,23 +22,17 @@ import pwd
 import re
 import sys
 import time
+import urllib.parse as urlparse
 
 import encryption_helper
 import phantom.app as phantom
 import requests
-from bs4 import BeautifulSoup, UnicodeDammit
+from bs4 import BeautifulSoup
 from django.http import HttpResponse
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 
 from azureadgraph_consts import *
-
-try:
-    import urllib.parse as urlparse
-except ImportError:
-    import urllib
-
-    import urlparse
 
 TC_FILE = "oauth_task.out"
 # SERVER_TOKEN_URL = "https://login.microsoftonline.com/{0}/oauth2/v2.0/token"
@@ -194,7 +188,7 @@ def _handle_login_response(request):
         state['code'] = AzureADGraphConnector().encrypt_state(code, "code")
         state[MS_AZURE_STATE_IS_ENCRYPTED] = True
     except Exception as e:
-        return HttpResponse("{}: {}".format(MS_AZURE_DECRYPTION_ERR, str(e)), content_type="text/plain", status=400)
+        return HttpResponse("{}: {}".format(MS_AZURE_DECRYPTION_ERROR, str(e)), content_type="text/plain", status=400)
 
     _save_app_state(state, asset_id, None)
 
@@ -303,28 +297,15 @@ class AzureADGraphConnector(BaseConnector):
         else:
             return decrypt_var
 
-    def _handle_py_ver_compat_for_input_str(self, input_str):
-        """
-        This method returns the encoded|original string based on the Python version.
-        :param input_str: Input string to be processed
-        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
-        """
-        try:
-            if input_str and self._python_version < 3:
-                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except Exception as e:
-            self.error_print("Error occurred while handling python 2to3 compatibility for the input string. Error: {}".format(e))
-
-        return input_str
-
     def _get_error_message_from_exception(self, e):
         """ This function is used to get appropriate error message from the exception.
         :param e: Exception object
         :return: error message
         """
         error_code = None
-        error_msg = ERR_MSG_UNAVAILABLE
+        error_msg = ERROR_MSG_UNAVAILABLE
 
+        self.error_print("Error occurred: ", e)
         try:
             if hasattr(e, "args"):
                 if len(e.args) > 1:
@@ -333,7 +314,7 @@ class AzureADGraphConnector(BaseConnector):
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
         except Exception as e:
-            self.error_print("Error occured while getting message from exeption. Error: {}".format(e))
+            self.error_print("Error occurred while getting message from exception. Error: {}".format(e))
             pass
 
         if not error_code:
@@ -354,7 +335,7 @@ class AzureADGraphConnector(BaseConnector):
         if response.status_code == 200 or response.status_code == 202 or response.status_code == 204:
             return RetVal(phantom.APP_SUCCESS, {})
 
-        return RetVal(action_result.set_status(phantom.APP_ERROR, MS_AZURE_ERR_EMPTY_RESPONSE.format(code=response.status_code)),
+        return RetVal(action_result.set_status(phantom.APP_ERROR, MS_AZURE_ERROR_EMPTY_RESPONSE.format(code=response.status_code)),
                       None)
 
     def _process_html_response(self, response, action_result):
@@ -383,7 +364,7 @@ class AzureADGraphConnector(BaseConnector):
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
                                                                       error_text)
 
-        message = self._handle_py_ver_compat_for_input_str(message.replace('{', '{{').replace('}', '}}'))
+        message = message.replace('{', '{{').replace('}', '}}')
 
         if status_code == 400:
             message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code, MS_AZURE_HTML_ERROR)
@@ -410,18 +391,18 @@ class AzureADGraphConnector(BaseConnector):
         if 200 <= response.status_code < 399:
             return RetVal(phantom.APP_SUCCESS, resp_json)
 
-        error_message = self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}'))
+        error_message = response.text.replace('{', '{{').replace('}', '}}')
         message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
                                                                                      error_message)
 
         # Show only error message if available
         if isinstance(resp_json.get('error', {}), dict):
             if resp_json.get('error', {}).get('message'):
-                error_message = self._handle_py_ver_compat_for_input_str(resp_json['error']['message'])
+                error_message = resp_json['error']['message']
                 message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
                                                                                              error_message)
         else:
-            error_message = self._handle_py_ver_compat_for_input_str(resp_json['error'])
+            error_message = resp_json['error']
             message = "Error from server. Status Code: {0} Data from server: {1}".format(response.status_code,
                                                                                          error_message)
 
@@ -467,7 +448,7 @@ class AzureADGraphConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-            response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', '{{').replace('}', '}}')))
+            response.status_code, response.text.replace('{', '{{').replace('}', '}}'))
 
         return RetVal(action_result.set_status(phantom.APP_ERROR, message), None)
 
@@ -601,7 +582,8 @@ class AzureADGraphConnector(BaseConnector):
 
         # If token is expired, generate a new token
         msg = action_result.get_message()
-        if msg and any(failure_message in msg for failure_message in AUTH_FAILURE_MESSAGES):
+
+        if msg and any(failure_message in msg for failure_message in AUTH_FAILURE_MSGS):
             self.save_progress("bad token")
             ret_val = self._get_token(action_result)
 
@@ -652,12 +634,8 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress(MS_OAUTH_URL_MSG)
         self.save_progress(redirect_uri)
 
-        if self._python_version < 3:
-            self._client_id = urllib.quote(self._client_id)
-            self._tenant = urllib.quote(self._tenant)
-        else:
-            self._client_id = urlparse.quote(self._client_id)
-            self._tenant = urlparse.quote(self._tenant)
+        self._client_id = urlparse.quote(self._client_id)
+        self._tenant = urlparse.quote(self._tenant)
 
         admin_consent_url_base = "https://login.microsoftonline.com/{0}/oauth2/authorize".format(self._tenant)
 
@@ -775,8 +753,8 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
-        temp_password = self._handle_py_ver_compat_for_input_str(param.get('temp_password', ''))
+        user_id = param['user_id']
+        temp_password = param.get('temp_password', '')
         force_change = param.get('force_change', True)
 
         parameters = {'api-version': '1.6'}
@@ -807,7 +785,7 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
+        user_id = param['user_id']
         parameters = {'api-version': '1.6'}
 
         data = {
@@ -833,7 +811,7 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
+        user_id = param['user_id']
         parameters = {'api-version': '1.6'}
         endpoint = '/users/{0}/invalidateAllRefreshTokens'.format(user_id)
 
@@ -854,7 +832,7 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
+        user_id = param['user_id']
         parameters = {'api-version': '1.6'}
 
         data = {
@@ -879,7 +857,7 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = self._handle_py_ver_compat_for_input_str(param.get('user_id'))
+        user_id = param.get('user_id')
         parameters = {'api-version': '1.6'}
         if user_id:
             endpoint = '/users/{}'.format(user_id)
@@ -906,9 +884,9 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
-        attribute = self._handle_py_ver_compat_for_input_str(param['attribute'])
-        attribute_value = self._handle_py_ver_compat_for_input_str(param['attribute_value'])
+        user_id = param['user_id']
+        attribute = param['attribute']
+        attribute_value = param['attribute_value']
         parameters = {'api-version': '1.6'}
 
         data = {
@@ -932,8 +910,8 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = self._handle_py_ver_compat_for_input_str(param['group_object_id'])
-        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
+        object_id = param['group_object_id']
+        user_id = param['user_id']
 
         parameters = {
             'api-version': '1.6'
@@ -963,8 +941,8 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = self._handle_py_ver_compat_for_input_str(param['group_object_id'])
-        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
+        object_id = param['group_object_id']
+        user_id = param['user_id']
 
         parameters = {
             'api-version': '1.6'
@@ -1008,7 +986,7 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = self._handle_py_ver_compat_for_input_str(param['object_id'])
+        object_id = param['object_id']
         parameters = {'api-version': '1.6'}
 
         endpoint = '/groups/{}'.format(object_id)
@@ -1051,7 +1029,7 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = self._handle_py_ver_compat_for_input_str(param['group_object_id'])
+        object_id = param['group_object_id']
         parameters = {'api-version': '1.6'}
 
         # Returns a list of group members' directory object URLs
@@ -1117,8 +1095,8 @@ class AzureADGraphConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        object_id = self._handle_py_ver_compat_for_input_str(param['group_object_id'])
-        user_id = self._handle_py_ver_compat_for_input_str(param['user_id'])
+        object_id = param['group_object_id']
+        user_id = param['user_id']
         parameters = {'api-version': '1.6'}
 
         # Returns a list of group members' directory object URLs
@@ -1186,8 +1164,8 @@ class AzureADGraphConnector(BaseConnector):
             try:
                 data['code'] = self.decrypt_state(self._state.get('code'), "code") if self._state.get('code') else None
             except Exception as e:
-                self.error_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
-                return action_result.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
+                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
+                return action_result.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERROR)
             data['grant_type'] = 'authorization_code'
 
         ret_val, resp_json = self._make_rest_call(req_url, action_result, headers=headers, data=data, method='post')
@@ -1321,19 +1299,13 @@ class AzureADGraphConnector(BaseConnector):
             self._state = {
                 "app_version": self.get_app_json().get('app_version')
             }
-            return self.set_status(phantom.APP_ERROR, MS_AZURE_STATE_FILE_CORRUPT_ERR)
-
-        # Fetching the Python major version
-        try:
-            self._python_version = int(sys.version_info[0])
-        except Exception:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+            return self.set_status(phantom.APP_ERROR, MS_AZURE_STATE_FILE_CORRUPT_ERROR)
 
         # get the asset config
         config = self.get_config()
 
-        self._tenant = self._handle_py_ver_compat_for_input_str(config[MS_AZURE_CONFIG_TENANT])
-        self._client_id = self._handle_py_ver_compat_for_input_str(config[MS_AZURE_CONFIG_CLIENT_ID])
+        self._tenant = config[MS_AZURE_CONFIG_TENANT]
+        self._client_id = config[MS_AZURE_CONFIG_CLIENT_ID]
         self._client_secret = config[MS_AZURE_CONFIG_CLIENT_SECRET]
 
         self._access_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING, None)
@@ -1341,16 +1313,16 @@ class AzureADGraphConnector(BaseConnector):
             try:
                 self._access_token = self.decrypt_state(self._access_token, "access")
             except Exception as e:
-                self.error_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
-                return self.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
+                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
+                self._access_token = None
 
         self._refresh_token = self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING, None)
         if self._state.get(MS_AZURE_STATE_IS_ENCRYPTED) and self._refresh_token:
             try:
                 self._refresh_token = self.decrypt_state(self._refresh_token, "refresh")
             except Exception as e:
-                self.error_print("{}: {}".format(MS_AZURE_DECRYPTION_ERR, self._get_error_message_from_exception(e)))
-                return self.set_status(phantom.APP_ERROR, MS_AZURE_DECRYPTION_ERR)
+                self.debug_print("{}: {}".format(MS_AZURE_DECRYPTION_ERROR, self._get_error_message_from_exception(e)))
+                self._refresh_token = None
 
         self._base_url = AZUREADGRAPH_API_URLS[config.get(MS_AZURE_URL, "Global")]
 
@@ -1362,23 +1334,23 @@ class AzureADGraphConnector(BaseConnector):
             if self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_ACCESS_TOKEN_STRING):
                 self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_ACCESS_TOKEN_STRING] = self.encrypt_state(self._access_token, "access")
         except Exception as e:
-            self.error_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
-            return self.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
+            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERROR, self._get_error_message_from_exception(e)))
+            self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_ACCESS_TOKEN_STRING] = None
 
         try:
             if self._state.get(MS_AZURE_TOKEN_STRING, {}).get(MS_AZURE_REFRESH_TOKEN_STRING):
                 self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_REFRESH_TOKEN_STRING] = self.encrypt_state(self._refresh_token, "refresh")
         except Exception as e:
-            self.error_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
-            return self.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
+            self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERROR, self._get_error_message_from_exception(e)))
+            self._state[MS_AZURE_TOKEN_STRING][MS_AZURE_REFRESH_TOKEN_STRING] = None
 
         if not self._state.get(MS_AZURE_STATE_IS_ENCRYPTED):
             try:
                 if self._state.get('code'):
                     self._state['code'] = self.encrypt_state(self._state['code'], "code")
             except Exception as e:
-                self.error_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERR, self._get_error_message_from_exception(e)))
-                return action_result.set_status(phantom.APP_ERROR, MS_AZURE_ENCRYPTION_ERR)
+                self.debug_print("{}: {}".format(MS_AZURE_ENCRYPTION_ERROR, self._get_error_message_from_exception(e)))
+                self._state['code'] = None
             if self._state.get(MS_AZURE_TOKEN_STRING, {}).get("id_token"):
                 self._state[MS_AZURE_TOKEN_STRING].pop("id_token")
 
