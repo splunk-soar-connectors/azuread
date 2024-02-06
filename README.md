@@ -2,11 +2,11 @@
 # Azure AD Graph
 
 Publisher: Splunk  
-Connector Version: 2.4.0  
+Connector Version: 2.5.0  
 Product Vendor: Microsoft  
 Product Name: Azure AD Graph  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.0.2  
+Minimum Product Version: 6.1.1  
 
 Connects to Azure AD Graph REST API services
 
@@ -180,12 +180,14 @@ For more information on using the filter_string parameter, refer to https://docs
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **filter_string** |  optional  | Filter string to apply to user listing | string | 
+**expand_string** |  optional  | Expand string to get a resource or collection referenced by a single relationship | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string |  |   success  failed 
 action_result.parameter.filter_string | string |  |   startswith(displayName,'User') 
+action_result.parameter.expand_string | string |  |   manager 
 action_result.data.\*.accountEnabled | boolean |  |   True  False 
 action_result.data.\*.ageGroup | string |  |  
 action_result.data.\*.assignedLicenses.\*.skuId | string |  |   189a915c-fe4f-4ffa-bde4-85b9628d07a0 
