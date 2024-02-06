@@ -1,1 +1,2 @@
 **Unreleased**
+* Added support for 'expand string' optional parameter in 'list users' action [PAPP-29808]
