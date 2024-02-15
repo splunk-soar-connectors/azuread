@@ -174,7 +174,7 @@ List users in a tenant
 Type: **investigate**  
 Read only: **True**
 
-For more information on using the filter_string parameter, refer to https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options.
+<p>For more information on using the filter_string parameter, refer to <a href='https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options' target='_blank'>https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options</a></p>.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
