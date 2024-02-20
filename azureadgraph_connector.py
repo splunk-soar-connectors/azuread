@@ -1,6 +1,6 @@
 # File: azureadgraph_connector.py
 #
-# Copyright (c) 2019-2023 Splunk Inc.
+# Copyright (c) 2019-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -733,8 +733,11 @@ class AzureADGraphConnector(BaseConnector):
             'api-version': '1.6'
         }
         filter_string = param.get('filter_string')
+        expand_string = param.get('expand_string')
         if filter_string:
             parameters['$filter'] = filter_string
+        if expand_string:
+            parameters['$expand'] = expand_string
 
         endpoint = '/users'
 
