@@ -2,16 +2,16 @@
 # Azure AD Graph
 
 Publisher: Splunk  
-Connector Version: 2.4.0  
+Connector Version: 2.5.0  
 Product Vendor: Microsoft  
 Product Name: Azure AD Graph  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.0.2  
+Minimum Product Version: 6.1.1  
 
 Connects to Azure AD Graph REST API services
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2019-2023 Splunk Inc."
+[comment]: # "  Copyright (c) 2019-2024 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
 [comment]: # "you may not use this file except in compliance with the License."
@@ -174,18 +174,20 @@ List users in a tenant
 Type: **investigate**  
 Read only: **True**
 
-For more information on using the filter_string parameter, refer to https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options.
+<p>For more information on using the filter_string parameter, refer to <a href='https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options' target='_blank'>https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options</a>.</p>
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **filter_string** |  optional  | Filter string to apply to user listing | string | 
+**expand_string** |  optional  | Expand string to get a resource or collection referenced by a single relationship | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string |  |   success  failed 
 action_result.parameter.filter_string | string |  |   startswith(displayName,'User') 
+action_result.parameter.expand_string | string |  |   manager 
 action_result.data.\*.accountEnabled | boolean |  |   True  False 
 action_result.data.\*.ageGroup | string |  |  
 action_result.data.\*.assignedLicenses.\*.skuId | string |  |   189a915c-fe4f-4ffa-bde4-85b9628d07a0 
