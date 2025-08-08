@@ -1,3 +1,3 @@
 **Unreleased**
 
-* chore(ci): update pre-commit config
+* Add message about AzureAD being deprecated
