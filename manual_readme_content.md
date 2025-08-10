@@ -1,3 +1,9 @@
+## Disclaimer
+
+This app relies on Azure AD Graph API, scheduled for retirement in early September 2025: https://techcommunity.microsoft.com/blog/microsoft-entra-blog/important-update-azure-ad-graph-retirement/4364990.
+
+Please migrate to the MS Graph for Active Directory app: https://splunkbase.splunk.com/app/6395.
+
 ## Authentication
 
 This app requires creating a Microsoft Azure Application. To do so, navigate to
