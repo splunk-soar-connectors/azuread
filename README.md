@@ -1,12 +1,18 @@
 # Azure AD Graph
 
 Publisher: Splunk \
-Connector Version: 2.5.0 \
+Connector Version: 2.5.1 \
 Product Vendor: Microsoft \
 Product Name: Azure AD Graph \
 Minimum Product Version: 6.1.1
 
 Connects to Azure AD Graph REST API services
+
+## Disclaimer
+
+This app relies on Azure AD Graph API, scheduled for retirement in early September 2025: https://techcommunity.microsoft.com/blog/microsoft-entra-blog/important-update-azure-ad-graph-retirement/4364990.
+
+Please migrate to the MS Graph for Active Directory app: https://splunkbase.splunk.com/app/6395.
 
 ## Authentication
 
