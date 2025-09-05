@@ -1,9 +1,9 @@
 # Azure AD Graph
 
-Publisher: Splunk \
-Connector Version: 2.5.1 \
-Product Vendor: Microsoft \
-Product Name: Azure AD Graph \
+Publisher: Splunk <br>
+Connector Version: 2.5.1 <br>
+Product Vendor: Microsoft <br>
+Product Name: Azure AD Graph <br>
 Minimum Product Version: 6.1.1
 
 Connects to Azure AD Graph REST API services
@@ -126,28 +126,28 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Use supplied credentials to generate a token with MS Graph \
-[list users](#action-list-users) - List users in a tenant \
-[reset password](#action-reset-password) - Reset or set a user's password in an Azure AD environment \
-[disable tokens](#action-disable-tokens) - Invalidate all active refresh tokens for a user in an Azure AD environment \
-[enable user](#action-enable-user) - Enable a user \
-[disable user](#action-disable-user) - Disable a user \
-[list user attributes](#action-list-user-attributes) - List attributes for all or a specified user \
-[set user attribute](#action-set-user-attribute) - Set an attribute for a user \
-[remove user](#action-remove-user) - Remove a user from a specified group \
-[add user](#action-add-user) - Add a user to the tenant by creating an organizational account \
-[list groups](#action-list-groups) - List groups in the organization \
-[get group](#action-get-group) - Get information about a group \
-[list group members](#action-list-group-members) - List the members in a group \
-[validate group](#action-validate-group) - Returns true if a user is in a group; otherwise, false \
-[list directory roles](#action-list-directory-roles) - List the directory roles in a tenant \
+[test connectivity](#action-test-connectivity) - Use supplied credentials to generate a token with MS Graph <br>
+[list users](#action-list-users) - List users in a tenant <br>
+[reset password](#action-reset-password) - Reset or set a user's password in an Azure AD environment <br>
+[disable tokens](#action-disable-tokens) - Invalidate all active refresh tokens for a user in an Azure AD environment <br>
+[enable user](#action-enable-user) - Enable a user <br>
+[disable user](#action-disable-user) - Disable a user <br>
+[list user attributes](#action-list-user-attributes) - List attributes for all or a specified user <br>
+[set user attribute](#action-set-user-attribute) - Set an attribute for a user <br>
+[remove user](#action-remove-user) - Remove a user from a specified group <br>
+[add user](#action-add-user) - Add a user to the tenant by creating an organizational account <br>
+[list groups](#action-list-groups) - List groups in the organization <br>
+[get group](#action-get-group) - Get information about a group <br>
+[list group members](#action-list-group-members) - List the members in a group <br>
+[validate group](#action-validate-group) - Returns true if a user is in a group; otherwise, false <br>
+[list directory roles](#action-list-directory-roles) - List the directory roles in a tenant <br>
 [generate token](#action-generate-token) - Generate a token or regenerates token when the token expires
 
 ## action: 'test connectivity'
 
 Use supplied credentials to generate a token with MS Graph
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -162,7 +162,7 @@ No Output
 
 List users in a tenant
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <p>For more information on using the filter_string parameter, refer to <a href='https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options' target='_blank'>https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options</a>.</p>
@@ -251,7 +251,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Reset or set a user's password in an Azure AD environment
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -280,7 +280,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Invalidate all active refresh tokens for a user in an Azure AD environment
 
-Type: **contain** \
+Type: **contain** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -308,7 +308,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Enable a user
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -333,7 +333,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Disable a user
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -358,7 +358,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List attributes for all or a specified user
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -443,7 +443,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Set an attribute for a user
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -473,7 +473,7 @@ action_result.parameter.ph_0 | ph | | |
 
 Remove a user from a specified group
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -500,7 +500,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Add a user to the tenant by creating an organizational account
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -527,7 +527,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List groups in the organization
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -565,7 +565,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Get information about a group
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -607,7 +607,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List the members in a group
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <p>Pagination is not implemented for this action as this endpoint does not support pagination. Here is the <b><a href='https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options' target='_blank'>Documentation</a></b> for the same.</p>
@@ -635,7 +635,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Returns true if a user is in a group; otherwise, false
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -662,7 +662,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 List the directory roles in a tenant
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 <p>Pagination is not implemented for this action as this endpoint does not support pagination. Here is the <b><a href='https://docs.microsoft.com/en-us/previous-versions/azure/ad/graph/howto/azure-ad-graph-api-supported-queries-filters-and-paging-options' target='_blank'>Documentation</a></b> for the same.</p>
@@ -694,7 +694,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Generate a token or regenerates token when the token expires
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
