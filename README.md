@@ -4,7 +4,7 @@ Publisher: Splunk <br>
 Connector Version: 2.5.2 <br>
 Product Vendor: Microsoft <br>
 Product Name: Azure AD Graph <br>
-Minimum Product Version: 6.1.1
+Minimum Product Version: 8.6.0
 
 Connects to Azure AD Graph REST API services
 
