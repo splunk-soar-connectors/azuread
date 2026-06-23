@@ -4,7 +4,7 @@ Publisher: Splunk <br>
 Connector Version: 2.5.2 <br>
 Product Vendor: Microsoft <br>
 Product Name: Azure AD Graph <br>
-Minimum Product Version: 6.1.1
+Minimum Product Version: 8.6.0
 
 Connects to Azure AD Graph REST API services
 
@@ -260,7 +260,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **user_id** | required | User ID to change password - can be user principal name or object ID | string | `azure user principal name` `azure object id` `email` |
 **force_change** | optional | Force user to change password on next login | boolean | |
-**temp_password** | required | Temporary password for user | string | |
+**temp_password** | required | Temporary password for user | password | |
 
 #### Action Output
 
@@ -268,7 +268,7 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
 action_result.parameter.force_change | boolean | | True False |
-action_result.parameter.temp_password | string | | Temp_PA$$w0rd |
+action_result.parameter.temp_password | password | | Temp_PA$$w0rd |
 action_result.parameter.user_id | string | `azure user principal name` `azure object id` `email` | ee3dc4f2-70f9-446f-a19e-6b4e95ba030d user@test.onmicrosoft.com |
 action_result.data | string | | |
 action_result.summary.status | string | | Successfully reset user password |
@@ -716,7 +716,7 @@ ______________________________________________________________________
 
 Auto-generated Splunk SOAR Connector documentation.
 
-Copyright 2025 Splunk Inc.
+Copyright 2026 Splunk Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

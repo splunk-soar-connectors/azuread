@@ -9,13 +9,13 @@
     "product_name": "Azure AD Graph",
     "product_version_regex": ".*",
     "publisher": "Splunk",
-    "license": "Copyright (c) 2019-2025 Splunk Inc.",
+    "license": "Copyright (c) 2019-2026 Splunk Inc.",
     "app_version": "2.5.2",
     "python_version": "3.9, 3.13",
     "utctime_updated": "2025-09-05T16:25:26.057054Z",
     "package_name": "phantom_azureadgraph",
     "main_module": "azureadgraph_connector.py",
-    "min_phantom_version": "6.1.1",
+    "min_phantom_version": "8.6.0",
     "fips_compliant": true,
     "latest_tested_versions": [
         "Cloud 2023-06-10, API Version: 1.6"
@@ -561,7 +561,7 @@
                 },
                 "temp_password": {
                     "description": "Temporary password for user",
-                    "data_type": "string",
+                    "data_type": "password",
                     "required": true,
                     "order": 2
                 }
@@ -587,7 +587,7 @@
                 },
                 {
                     "data_path": "action_result.parameter.temp_password",
-                    "data_type": "string",
+                    "data_type": "password",
                     "example_values": [
                         "Temp_PA$$w0rd"
                     ]
