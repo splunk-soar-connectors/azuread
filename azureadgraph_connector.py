@@ -860,8 +860,22 @@ class AzureADGraphConnector(BaseConnector):
 
         action_result.add_data(response)
 
+        invalidate_endpoint = f"/users/{_quote_path_segment(user_id)}/invalidateAllRefreshTokens"
+        ret_val, invalidate_response = self._make_rest_call_helper(
+            action_result,
+            invalidate_endpoint,
+            params=parameters,
+            method="post",
+        )
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(invalidate_response)
+
         summary = action_result.update_summary({})
-        summary["status"] = f"Successfully disabled user {user_id}"
+        summary["status"] = (
+            f"Successfully disabled user {user_id} and invalidated refresh tokens; existing access tokens remain valid until they expire"
+        )
 
         return action_result.set_status(phantom.APP_SUCCESS)
 

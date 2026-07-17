@@ -840,7 +840,7 @@
         },
         {
             "action": "disable user",
-            "description": "Disable a user",
+            "description": "Disable a user and invalidate their refresh tokens. Existing access tokens remain valid until they expire",
             "type": "generic",
             "identifier": "disable_user",
             "read_only": false,
