@@ -42,6 +42,11 @@ AZUREADGRAPH_API_URL = "https://graph.windows.net"
 MAX_END_OFFSET_VAL = 2147483646
 
 
+def _quote_path_segment(value):
+    """Encode an action-supplied identifier as one URL path segment."""
+    return urlparse.quote(str(value), safe="").replace(".", "%2E")
+
+
 def _handle_login_redirect(request, key):
     """This function is used to redirect login request to microsoft login page.
 
@@ -746,7 +751,7 @@ class AzureADGraphConnector(BaseConnector):
         if temp_password != "":
             data["passwordProfile"]["password"] = temp_password
 
-        endpoint = f"/users/{user_id}"
+        endpoint = f"/users/{_quote_path_segment(user_id)}"
 
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method="patch")
 
@@ -768,7 +773,7 @@ class AzureADGraphConnector(BaseConnector):
 
         data = {"accountEnabled": True}
 
-        endpoint = f"/users/{user_id}"
+        endpoint = f"/users/{_quote_path_segment(user_id)}"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method="patch")
 
         if phantom.is_fail(ret_val):
@@ -788,7 +793,7 @@ class AzureADGraphConnector(BaseConnector):
 
         user_id = param["user_id"]
         parameters = {"api-version": "1.6"}
-        endpoint = f"/users/{user_id}/invalidateAllRefreshTokens"
+        endpoint = f"/users/{_quote_path_segment(user_id)}/invalidateAllRefreshTokens"
 
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="post")
 
@@ -811,7 +816,7 @@ class AzureADGraphConnector(BaseConnector):
 
         data = {"accountEnabled": False}
 
-        endpoint = f"/users/{user_id}"
+        endpoint = f"/users/{_quote_path_segment(user_id)}"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method="patch")
 
         if phantom.is_fail(ret_val):
@@ -831,7 +836,7 @@ class AzureADGraphConnector(BaseConnector):
         user_id = param.get("user_id")
         parameters = {"api-version": "1.6"}
         if user_id:
-            endpoint = f"/users/{user_id}"
+            endpoint = f"/users/{_quote_path_segment(user_id)}"
         else:
             endpoint = "/users"
 
@@ -861,7 +866,7 @@ class AzureADGraphConnector(BaseConnector):
 
         data = {attribute: attribute_value}
 
-        endpoint = f"/users/{user_id}"
+        endpoint = f"/users/{_quote_path_segment(user_id)}"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method="patch")
 
         if phantom.is_fail(ret_val):
@@ -883,10 +888,12 @@ class AzureADGraphConnector(BaseConnector):
         parameters = {"api-version": "1.6"}
 
         data = {
-            "url": "https://{}/{}/directoryObjects/{}".format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant, user_id)
+            "url": "https://{}/{}/directoryObjects/{}".format(
+                AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant, _quote_path_segment(user_id)
+            )
         }
 
-        endpoint = f"/groups/{object_id}/$links/members"
+        endpoint = f"/groups/{_quote_path_segment(object_id)}/$links/members"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method="post")
 
         summary = action_result.update_summary({})
@@ -910,7 +917,7 @@ class AzureADGraphConnector(BaseConnector):
 
         parameters = {"api-version": "1.6"}
 
-        endpoint = f"/groups/{object_id}/$links/members/{user_id}"
+        endpoint = f"/groups/{_quote_path_segment(object_id)}/$links/members/{_quote_path_segment(user_id)}"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="delete")
 
         summary = action_result.update_summary({})
@@ -949,7 +956,7 @@ class AzureADGraphConnector(BaseConnector):
         object_id = param["object_id"]
         parameters = {"api-version": "1.6"}
 
-        endpoint = f"/groups/{object_id}"
+        endpoint = f"/groups/{_quote_path_segment(object_id)}"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
 
         if phantom.is_fail(ret_val):
@@ -967,7 +974,7 @@ class AzureADGraphConnector(BaseConnector):
         parameters = {"api-version": "1.6"}
         endpoint = "/users"
         if user:
-            endpoint = endpoint + "/" + user
+            endpoint = endpoint + "/" + _quote_path_segment(user)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
 
         user_id_map = dict()
@@ -992,7 +999,7 @@ class AzureADGraphConnector(BaseConnector):
         parameters = {"api-version": "1.6"}
 
         # Returns a list of group members' directory object URLs
-        endpoint = f"/groups/{object_id}/$links/members"
+        endpoint = f"/groups/{_quote_path_segment(object_id)}/$links/members"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
 
         if phantom.is_fail(ret_val):
@@ -1049,7 +1056,7 @@ class AzureADGraphConnector(BaseConnector):
         parameters = {"api-version": "1.6"}
 
         # Returns a list of group members' directory object URLs
-        endpoint = f"/groups/{object_id}/$links/members"
+        endpoint = f"/groups/{_quote_path_segment(object_id)}/$links/members"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
 
         if phantom.is_fail(ret_val):
