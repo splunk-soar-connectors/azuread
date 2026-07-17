@@ -16,10 +16,12 @@
 #
 # Phantom App imports
 import grp
+import hmac
 import json
 import os
 import pwd
 import re
+import secrets
 import sys
 import time
 import urllib.parse as urlparse
@@ -45,6 +47,26 @@ MAX_END_OFFSET_VAL = 2147483646
 def _quote_path_segment(value):
     """Encode an action-supplied identifier as one URL path segment."""
     return urlparse.quote(str(value), safe="").replace(".", "%2E")
+
+
+def _consume_oauth_state(oauth_state):
+    """Validate and consume the one-time OAuth state value."""
+    try:
+        asset_id, presented_nonce = oauth_state.rsplit("_", 1)
+    except (AttributeError, ValueError):
+        return None, None
+
+    if not asset_id.isalnum() or not presented_nonce:
+        return None, None
+
+    state = _load_app_state(asset_id)
+    stored_nonce = state.get(MS_AZURE_OAUTH_STATE_NONCE)
+    if not stored_nonce or not hmac.compare_digest(stored_nonce, presented_nonce):
+        return None, None
+
+    state.pop(MS_AZURE_OAUTH_STATE_NONCE, None)
+    _save_app_state(state, asset_id, None)
+    return asset_id, state
 
 
 def _handle_login_redirect(request, key):
@@ -150,9 +172,13 @@ def _handle_login_response(request):
     :return: HttpResponse. The response displayed on authorization URL page
     """
 
-    asset_id = request.GET.get("state")
+    oauth_state = request.GET.get("state")
+    if not oauth_state:
+        return HttpResponse("ERROR: OAuth state not found in URL", content_type="text/plain", status=400)
+
+    asset_id, state = _consume_oauth_state(oauth_state)
     if not asset_id:
-        return HttpResponse(f"ERROR: Asset ID not found in URL\n{json.dumps(request.GET)}", content_type="text/plain", status=400)
+        return HttpResponse("ERROR: Invalid or expired OAuth state", content_type="text/plain", status=400)
 
     # Check for error in URL
     error = request.GET.get("error")
@@ -171,8 +197,6 @@ def _handle_login_response(request):
     # If none of the code or admin_consent is available
     if not (code or admin_consent):
         return HttpResponse(f"Error while authenticating\n{json.dumps(request.GET)}", content_type="text/plain", status=400)
-
-    state = _load_app_state(asset_id)
 
     # If value of admin_consent is available
     if admin_consent:
@@ -225,8 +249,9 @@ def _handle_rest_request(request, path_parts):
     # To handle response from microsoft login page
     if call_type == "result":
         return_val = _handle_login_response(request)
-        asset_id = request.GET.get("state")
-        if asset_id and asset_id.isalnum():
+        oauth_state = request.GET.get("state", "")
+        asset_id = oauth_state.rsplit("_", 1)[0] if "_" in oauth_state else None
+        if return_val.status_code < 400 and asset_id and asset_id.isalnum():
             app_dir = os.path.dirname(os.path.abspath(__file__))
             auth_status_file_path = f"{app_dir}/{asset_id}_{TC_FILE}"
             real_auth_status_file_path = os.path.abspath(auth_status_file_path)
@@ -629,10 +654,11 @@ class AzureADGraphConnector(BaseConnector):
 
         admin_consent_url_base = f"https://login.microsoftonline.com/{self._tenant}/oauth2/authorize"
 
+        oauth_state_nonce = secrets.token_hex(32)
         query_params = {
             "client_id": self._client_id,
             "redirect_uri": redirect_uri,
-            "state": self.get_asset_id(),
+            "state": f"{self.get_asset_id()}_{oauth_state_nonce}",
             "scope": MS_AZURE_CODE_GENERATION_SCOPE,
             "resource": urlparse.quote("https://{}/".format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")]), safe=""),
             "response_type": "code",
@@ -643,6 +669,7 @@ class AzureADGraphConnector(BaseConnector):
         admin_consent_url = f"{admin_consent_url_base}?{query_string}"
 
         app_state["admin_consent_url"] = admin_consent_url
+        app_state[MS_AZURE_OAUTH_STATE_NONCE] = oauth_state_nonce
 
         # The URL that the user should open in a different tab.
         # This is pointing to a REST endpoint that points to the app
