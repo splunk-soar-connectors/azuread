@@ -586,13 +586,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.temp_password",
-                    "data_type": "password",
-                    "example_values": [
-                        "Temp_PA$$w0rd"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.user_id",
                     "data_type": "string",
                     "example_values": [

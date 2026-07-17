@@ -773,7 +773,9 @@ class AzureADGraphConnector(BaseConnector):
 
     def _handle_reset_password(self, param):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        safe_param = dict(param)
+        safe_param.pop("temp_password", None)
+        action_result = self.add_action_result(ActionResult(safe_param))
 
         user_id = param["user_id"]
         temp_password = param.get("temp_password", "")
