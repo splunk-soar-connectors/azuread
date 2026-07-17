@@ -960,6 +960,18 @@ class AzureADGraphConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if "does not exist or one of its queried" in message:
+                group_endpoint = f"/groups/{_quote_path_segment(object_id)}"
+                group_ret_val, _ = self._make_rest_call_helper(
+                    action_result,
+                    group_endpoint,
+                    params=parameters,
+                    method="get",
+                )
+                if phantom.is_fail(group_ret_val):
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Unable to verify group {object_id}; the user removal was not confirmed",
+                    )
                 summary["status"] = "User not in group"
             else:
                 return action_result.get_status()
