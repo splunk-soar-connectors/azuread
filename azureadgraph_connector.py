@@ -49,6 +49,12 @@ def _quote_path_segment(value):
     return urlparse.quote(str(value), safe="").replace(".", "%2E")
 
 
+def _is_oauth_token_response(response):
+    """Return whether a response came from an OAuth token endpoint."""
+    response_url = getattr(response, "url", "")
+    return urlparse.urlparse(response_url).path.rstrip("/").lower().endswith("/oauth2/token")
+
+
 def _consume_oauth_state(oauth_state):
     """Validate and consume the one-time OAuth state value."""
     try:
@@ -440,8 +446,9 @@ class AzureADGraphConnector(BaseConnector):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, "add_debug_data"):
             action_result.add_debug_data({"r_status_code": response.status_code})
-            action_result.add_debug_data({"r_text": response.text})
-            action_result.add_debug_data({"r_headers": response.headers})
+            if not _is_oauth_token_response(response):
+                action_result.add_debug_data({"r_text": response.text})
+                action_result.add_debug_data({"r_headers": response.headers})
 
         # Process each 'Content-Type' of response separately
 
