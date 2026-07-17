@@ -60,6 +60,8 @@ MS_AZURE_STATE_FILE_CORRUPT_ERROR = (
     "Resetting the state file with the default format. Please run the test connectivity once."
 )
 MS_AZURE_NEXT_LINK_STRING = "odata.nextLink"
+MS_AZURE_MAX_PAGINATION_PAGES = 1000
+MS_AZURE_MAX_PAGINATION_ITEMS = 100000
 MS_AZURE_PAGE_SIZE = 999
 
 # For authorization code

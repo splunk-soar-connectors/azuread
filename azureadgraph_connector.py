@@ -1174,27 +1174,58 @@ class AzureADGraphConnector(BaseConnector):
         else:
             parameters = {"$top": page_size}
 
+        page_count = 0
+        item_count = 0
+        seen_skip_tokens = set()
+
         while True:
+            if page_count >= MS_AZURE_MAX_PAGINATION_PAGES:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Pagination stopped after {MS_AZURE_MAX_PAGINATION_PAGES} pages",
+                )
+
             # make rest call
             ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
 
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
+            page_count += 1
             if "value" in response:
-                for user in response.get("value", []):
+                page_items = response.get("value", [])
+                if item_count + len(page_items) > MS_AZURE_MAX_PAGINATION_ITEMS:
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Pagination stopped before exceeding {MS_AZURE_MAX_PAGINATION_ITEMS} items",
+                    )
+                for user in page_items:
                     action_result.add_data(user)
+                item_count += len(page_items)
             else:
+                if item_count >= MS_AZURE_MAX_PAGINATION_ITEMS:
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Pagination stopped before exceeding {MS_AZURE_MAX_PAGINATION_ITEMS} items",
+                    )
                 action_result.add_data(response)
+                item_count += 1
 
             if response.get(MS_AZURE_NEXT_LINK_STRING):
                 parsed_url = urlparse.urlparse(response.get(MS_AZURE_NEXT_LINK_STRING))
                 try:
-                    parameters["$skiptoken"] = urlparse.parse_qs(parsed_url.query).get("$skiptoken")[0]
+                    skip_token = urlparse.parse_qs(parsed_url.query).get("$skiptoken")[0]
                 except Exception as e:
                     self.error_print(f"odata.nextLink is {response.get(MS_AZURE_NEXT_LINK_STRING)}")
-                    self.error_print(f"Error occurred while extracting skiptoken from the odata.nextLink. Error: {e}")
-                    break
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Unable to extract skiptoken from odata.nextLink: {e}",
+                    )
+
+                if skip_token in seen_skip_tokens:
+                    return action_result.set_status(phantom.APP_ERROR, "Pagination stopped because the server repeated a skiptoken")
+                seen_skip_tokens.add(skip_token)
+                parameters["$skiptoken"] = skip_token
             else:
                 break
 
