@@ -131,7 +131,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [reset password](#action-reset-password) - Reset or set a user's password in an Azure AD environment <br>
 [disable tokens](#action-disable-tokens) - Invalidate all active refresh tokens for a user in an Azure AD environment <br>
 [enable user](#action-enable-user) - Enable a user <br>
-[disable user](#action-disable-user) - Disable a user <br>
+[disable user](#action-disable-user) - Disable a user and invalidate their refresh tokens. Existing access tokens remain valid until they expire <br>
 [list user attributes](#action-list-user-attributes) - List attributes for all or a specified user <br>
 [set user attribute](#action-set-user-attribute) - Set an attribute for a user <br>
 [remove user](#action-remove-user) - Remove a user from a specified group <br>
@@ -268,13 +268,13 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
 action_result.parameter.force_change | boolean | | True False |
-action_result.parameter.temp_password | password | | Temp_PA$$w0rd |
 action_result.parameter.user_id | string | `azure user principal name` `azure object id` `email` | ee3dc4f2-70f9-446f-a19e-6b4e95ba030d user@test.onmicrosoft.com |
 action_result.data | string | | |
 action_result.summary.status | string | | Successfully reset user password |
 action_result.message | string | | Status: Successfully reset user password |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
+action_result.parameter.temp_password | password | | |
 
 ## action: 'disable tokens'
 
@@ -331,7 +331,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 ## action: 'disable user'
 
-Disable a user
+Disable a user and invalidate their refresh tokens. Existing access tokens remain valid until they expire
 
 Type: **generic** <br>
 Read only: **False**

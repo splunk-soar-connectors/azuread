@@ -45,6 +45,7 @@ MS_AZURE_URL = "region"
 MS_AZURE_CONFIG_ADMIN_ACCESS = "admin_access"
 MS_AZURE_TOKEN_STRING = "token"
 MS_AZURE_STATE_IS_ENCRYPTED = "is_encrypted"
+MS_AZURE_OAUTH_STATE_NONCE = "oauth_state_nonce"
 MS_AZURE_ACCESS_TOKEN_STRING = "access_token"
 MS_AZURE_REFRESH_TOKEN_STRING = "refresh_token"
 MS_AZURE_PHANTOM_BASE_URL = "{phantom_base_url}rest"
@@ -59,6 +60,8 @@ MS_AZURE_STATE_FILE_CORRUPT_ERROR = (
     "Resetting the state file with the default format. Please run the test connectivity once."
 )
 MS_AZURE_NEXT_LINK_STRING = "odata.nextLink"
+MS_AZURE_MAX_PAGINATION_PAGES = 1000
+MS_AZURE_MAX_PAGINATION_ITEMS = 100000
 MS_AZURE_PAGE_SIZE = 999
 
 # For authorization code

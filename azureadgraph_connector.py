@@ -16,10 +16,12 @@
 #
 # Phantom App imports
 import grp
+import hmac
 import json
 import os
 import pwd
 import re
+import secrets
 import sys
 import time
 import urllib.parse as urlparse
@@ -40,6 +42,37 @@ TC_FILE = "oauth_task.out"
 MSGRAPH_API_URL = "https://graph.microsoft.com/v1.0"
 AZUREADGRAPH_API_URL = "https://graph.windows.net"
 MAX_END_OFFSET_VAL = 2147483646
+
+
+def _quote_path_segment(value):
+    """Encode an action-supplied identifier as one URL path segment."""
+    return urlparse.quote(str(value), safe="").replace(".", "%2E")
+
+
+def _is_oauth_token_response(response):
+    """Return whether a response came from an OAuth token endpoint."""
+    response_url = getattr(response, "url", "")
+    return urlparse.urlparse(response_url).path.rstrip("/").lower().endswith("/oauth2/token")
+
+
+def _consume_oauth_state(oauth_state):
+    """Validate and consume the one-time OAuth state value."""
+    try:
+        asset_id, presented_nonce = oauth_state.rsplit("_", 1)
+    except (AttributeError, ValueError):
+        return None, None
+
+    if not asset_id.isalnum() or not presented_nonce:
+        return None, None
+
+    state = _load_app_state(asset_id)
+    stored_nonce = state.get(MS_AZURE_OAUTH_STATE_NONCE)
+    if not stored_nonce or not hmac.compare_digest(stored_nonce, presented_nonce):
+        return None, None
+
+    state.pop(MS_AZURE_OAUTH_STATE_NONCE, None)
+    _save_app_state(state, asset_id, None)
+    return asset_id, state
 
 
 def _handle_login_redirect(request, key):
@@ -145,9 +178,13 @@ def _handle_login_response(request):
     :return: HttpResponse. The response displayed on authorization URL page
     """
 
-    asset_id = request.GET.get("state")
+    oauth_state = request.GET.get("state")
+    if not oauth_state:
+        return HttpResponse("ERROR: OAuth state not found in URL", content_type="text/plain", status=400)
+
+    asset_id, state = _consume_oauth_state(oauth_state)
     if not asset_id:
-        return HttpResponse(f"ERROR: Asset ID not found in URL\n{json.dumps(request.GET)}", content_type="text/plain", status=400)
+        return HttpResponse("ERROR: Invalid or expired OAuth state", content_type="text/plain", status=400)
 
     # Check for error in URL
     error = request.GET.get("error")
@@ -166,8 +203,6 @@ def _handle_login_response(request):
     # If none of the code or admin_consent is available
     if not (code or admin_consent):
         return HttpResponse(f"Error while authenticating\n{json.dumps(request.GET)}", content_type="text/plain", status=400)
-
-    state = _load_app_state(asset_id)
 
     # If value of admin_consent is available
     if admin_consent:
@@ -220,8 +255,9 @@ def _handle_rest_request(request, path_parts):
     # To handle response from microsoft login page
     if call_type == "result":
         return_val = _handle_login_response(request)
-        asset_id = request.GET.get("state")
-        if asset_id and asset_id.isalnum():
+        oauth_state = request.GET.get("state", "")
+        asset_id = oauth_state.rsplit("_", 1)[0] if "_" in oauth_state else None
+        if return_val.status_code < 400 and asset_id and asset_id.isalnum():
             app_dir = os.path.dirname(os.path.abspath(__file__))
             auth_status_file_path = f"{app_dir}/{asset_id}_{TC_FILE}"
             real_auth_status_file_path = os.path.abspath(auth_status_file_path)
@@ -410,8 +446,9 @@ class AzureADGraphConnector(BaseConnector):
         # store the r_text in debug data, it will get dumped in the logs if the action fails
         if hasattr(action_result, "add_debug_data"):
             action_result.add_debug_data({"r_status_code": response.status_code})
-            action_result.add_debug_data({"r_text": response.text})
-            action_result.add_debug_data({"r_headers": response.headers})
+            if not _is_oauth_token_response(response):
+                action_result.add_debug_data({"r_text": response.text})
+                action_result.add_debug_data({"r_headers": response.headers})
 
         # Process each 'Content-Type' of response separately
 
@@ -624,10 +661,11 @@ class AzureADGraphConnector(BaseConnector):
 
         admin_consent_url_base = f"https://login.microsoftonline.com/{self._tenant}/oauth2/authorize"
 
+        oauth_state_nonce = secrets.token_hex(32)
         query_params = {
             "client_id": self._client_id,
             "redirect_uri": redirect_uri,
-            "state": self.get_asset_id(),
+            "state": f"{self.get_asset_id()}_{oauth_state_nonce}",
             "scope": MS_AZURE_CODE_GENERATION_SCOPE,
             "resource": urlparse.quote("https://{}/".format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")]), safe=""),
             "response_type": "code",
@@ -638,6 +676,7 @@ class AzureADGraphConnector(BaseConnector):
         admin_consent_url = f"{admin_consent_url_base}?{query_string}"
 
         app_state["admin_consent_url"] = admin_consent_url
+        app_state[MS_AZURE_OAUTH_STATE_NONCE] = oauth_state_nonce
 
         # The URL that the user should open in a different tab.
         # This is pointing to a REST endpoint that points to the app
@@ -734,7 +773,9 @@ class AzureADGraphConnector(BaseConnector):
 
     def _handle_reset_password(self, param):
         self.save_progress(f"In action handler for: {self.get_action_identifier()}")
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        safe_param = dict(param)
+        safe_param.pop("temp_password", None)
+        action_result = self.add_action_result(ActionResult(safe_param))
 
         user_id = param["user_id"]
         temp_password = param.get("temp_password", "")
@@ -746,7 +787,7 @@ class AzureADGraphConnector(BaseConnector):
         if temp_password != "":
             data["passwordProfile"]["password"] = temp_password
 
-        endpoint = f"/users/{user_id}"
+        endpoint = f"/users/{_quote_path_segment(user_id)}"
 
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method="patch")
 
@@ -768,7 +809,7 @@ class AzureADGraphConnector(BaseConnector):
 
         data = {"accountEnabled": True}
 
-        endpoint = f"/users/{user_id}"
+        endpoint = f"/users/{_quote_path_segment(user_id)}"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method="patch")
 
         if phantom.is_fail(ret_val):
@@ -788,7 +829,7 @@ class AzureADGraphConnector(BaseConnector):
 
         user_id = param["user_id"]
         parameters = {"api-version": "1.6"}
-        endpoint = f"/users/{user_id}/invalidateAllRefreshTokens"
+        endpoint = f"/users/{_quote_path_segment(user_id)}/invalidateAllRefreshTokens"
 
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="post")
 
@@ -811,7 +852,7 @@ class AzureADGraphConnector(BaseConnector):
 
         data = {"accountEnabled": False}
 
-        endpoint = f"/users/{user_id}"
+        endpoint = f"/users/{_quote_path_segment(user_id)}"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method="patch")
 
         if phantom.is_fail(ret_val):
@@ -819,8 +860,22 @@ class AzureADGraphConnector(BaseConnector):
 
         action_result.add_data(response)
 
+        invalidate_endpoint = f"/users/{_quote_path_segment(user_id)}/invalidateAllRefreshTokens"
+        ret_val, invalidate_response = self._make_rest_call_helper(
+            action_result,
+            invalidate_endpoint,
+            params=parameters,
+            method="post",
+        )
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        action_result.add_data(invalidate_response)
+
         summary = action_result.update_summary({})
-        summary["status"] = f"Successfully disabled user {user_id}"
+        summary["status"] = (
+            f"Successfully disabled user {user_id} and invalidated refresh tokens; existing access tokens remain valid until they expire"
+        )
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -831,7 +886,7 @@ class AzureADGraphConnector(BaseConnector):
         user_id = param.get("user_id")
         parameters = {"api-version": "1.6"}
         if user_id:
-            endpoint = f"/users/{user_id}"
+            endpoint = f"/users/{_quote_path_segment(user_id)}"
         else:
             endpoint = "/users"
 
@@ -861,7 +916,7 @@ class AzureADGraphConnector(BaseConnector):
 
         data = {attribute: attribute_value}
 
-        endpoint = f"/users/{user_id}"
+        endpoint = f"/users/{_quote_path_segment(user_id)}"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method="patch")
 
         if phantom.is_fail(ret_val):
@@ -883,10 +938,12 @@ class AzureADGraphConnector(BaseConnector):
         parameters = {"api-version": "1.6"}
 
         data = {
-            "url": "https://{}/{}/directoryObjects/{}".format(AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant, user_id)
+            "url": "https://{}/{}/directoryObjects/{}".format(
+                AZUREADGRAPH_API_REGION[config.get(MS_AZURE_URL, "Global")], self._tenant, _quote_path_segment(user_id)
+            )
         }
 
-        endpoint = f"/groups/{object_id}/$links/members"
+        endpoint = f"/groups/{_quote_path_segment(object_id)}/$links/members"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, json=data, method="post")
 
         summary = action_result.update_summary({})
@@ -910,13 +967,25 @@ class AzureADGraphConnector(BaseConnector):
 
         parameters = {"api-version": "1.6"}
 
-        endpoint = f"/groups/{object_id}/$links/members/{user_id}"
+        endpoint = f"/groups/{_quote_path_segment(object_id)}/$links/members/{_quote_path_segment(user_id)}"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="delete")
 
         summary = action_result.update_summary({})
         if phantom.is_fail(ret_val):
             message = action_result.get_message()
             if "does not exist or one of its queried" in message:
+                group_endpoint = f"/groups/{_quote_path_segment(object_id)}"
+                group_ret_val, _ = self._make_rest_call_helper(
+                    action_result,
+                    group_endpoint,
+                    params=parameters,
+                    method="get",
+                )
+                if phantom.is_fail(group_ret_val):
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Unable to verify group {object_id}; the user removal was not confirmed",
+                    )
                 summary["status"] = "User not in group"
             else:
                 return action_result.get_status()
@@ -949,7 +1018,7 @@ class AzureADGraphConnector(BaseConnector):
         object_id = param["object_id"]
         parameters = {"api-version": "1.6"}
 
-        endpoint = f"/groups/{object_id}"
+        endpoint = f"/groups/{_quote_path_segment(object_id)}"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
 
         if phantom.is_fail(ret_val):
@@ -967,7 +1036,7 @@ class AzureADGraphConnector(BaseConnector):
         parameters = {"api-version": "1.6"}
         endpoint = "/users"
         if user:
-            endpoint = endpoint + "/" + user
+            endpoint = endpoint + "/" + _quote_path_segment(user)
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
 
         user_id_map = dict()
@@ -992,7 +1061,7 @@ class AzureADGraphConnector(BaseConnector):
         parameters = {"api-version": "1.6"}
 
         # Returns a list of group members' directory object URLs
-        endpoint = f"/groups/{object_id}/$links/members"
+        endpoint = f"/groups/{_quote_path_segment(object_id)}/$links/members"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
 
         if phantom.is_fail(ret_val):
@@ -1049,7 +1118,7 @@ class AzureADGraphConnector(BaseConnector):
         parameters = {"api-version": "1.6"}
 
         # Returns a list of group members' directory object URLs
-        endpoint = f"/groups/{object_id}/$links/members"
+        endpoint = f"/groups/{_quote_path_segment(object_id)}/$links/members"
         ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
 
         if phantom.is_fail(ret_val):
@@ -1140,27 +1209,58 @@ class AzureADGraphConnector(BaseConnector):
         else:
             parameters = {"$top": page_size}
 
+        page_count = 0
+        item_count = 0
+        seen_skip_tokens = set()
+
         while True:
+            if page_count >= MS_AZURE_MAX_PAGINATION_PAGES:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Pagination stopped after {MS_AZURE_MAX_PAGINATION_PAGES} pages",
+                )
+
             # make rest call
             ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
 
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
+            page_count += 1
             if "value" in response:
-                for user in response.get("value", []):
+                page_items = response.get("value", [])
+                if item_count + len(page_items) > MS_AZURE_MAX_PAGINATION_ITEMS:
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Pagination stopped before exceeding {MS_AZURE_MAX_PAGINATION_ITEMS} items",
+                    )
+                for user in page_items:
                     action_result.add_data(user)
+                item_count += len(page_items)
             else:
+                if item_count >= MS_AZURE_MAX_PAGINATION_ITEMS:
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Pagination stopped before exceeding {MS_AZURE_MAX_PAGINATION_ITEMS} items",
+                    )
                 action_result.add_data(response)
+                item_count += 1
 
             if response.get(MS_AZURE_NEXT_LINK_STRING):
                 parsed_url = urlparse.urlparse(response.get(MS_AZURE_NEXT_LINK_STRING))
                 try:
-                    parameters["$skiptoken"] = urlparse.parse_qs(parsed_url.query).get("$skiptoken")[0]
+                    skip_token = urlparse.parse_qs(parsed_url.query).get("$skiptoken")[0]
                 except Exception as e:
                     self.error_print(f"odata.nextLink is {response.get(MS_AZURE_NEXT_LINK_STRING)}")
-                    self.error_print(f"Error occurred while extracting skiptoken from the odata.nextLink. Error: {e}")
-                    break
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Unable to extract skiptoken from odata.nextLink: {e}",
+                    )
+
+                if skip_token in seen_skip_tokens:
+                    return action_result.set_status(phantom.APP_ERROR, "Pagination stopped because the server repeated a skiptoken")
+                seen_skip_tokens.add(skip_token)
+                parameters["$skiptoken"] = skip_token
             else:
                 break
 
