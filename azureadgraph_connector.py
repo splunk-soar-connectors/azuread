@@ -42,6 +42,7 @@ TC_FILE = "oauth_task.out"
 MSGRAPH_API_URL = "https://graph.microsoft.com/v1.0"
 AZUREADGRAPH_API_URL = "https://graph.windows.net"
 MAX_END_OFFSET_VAL = 2147483646
+PATH_IDENTIFIER_PARAMETERS = ("user_id", "object_id", "group_object_id")
 
 
 def _quote_path_segment(value):
@@ -1273,6 +1274,16 @@ class AzureADGraphConnector(BaseConnector):
         action_id = self.get_action_identifier()
 
         self.debug_print("action_id", self.get_action_identifier())
+
+        for parameter_name in PATH_IDENTIFIER_PARAMETERS:
+            if parameter_name in param and str(param[parameter_name]).strip() in {".", ".."}:
+                safe_param = dict(param)
+                safe_param.pop("temp_password", None)
+                action_result = self.add_action_result(ActionResult(safe_param))
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Invalid {parameter_name}: dot-segment identifiers are not allowed",
+                )
 
         if action_id == "test_connectivity":
             ret_val = self._handle_test_connectivity(param)
