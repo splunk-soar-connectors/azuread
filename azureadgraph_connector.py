@@ -1285,6 +1285,13 @@ class AzureADGraphConnector(BaseConnector):
                     f"Invalid {parameter_name}: dot-segment identifiers are not allowed",
                 )
 
+        if action_id == "remove_user" and not str(param.get("group_object_id", "")).strip():
+            action_result = self.add_action_result(ActionResult(dict(param)))
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Invalid group_object_id: an identifier is required to remove a user",
+            )
+
         if action_id == "test_connectivity":
             ret_val = self._handle_test_connectivity(param)
 
