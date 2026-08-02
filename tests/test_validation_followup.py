@@ -25,5 +25,12 @@ class ValidationFollowupTests(unittest.TestCase):
         self.assertIn('"state_nonce": oauth_state_nonce', source)
         self.assertIn("urlparse.urlencode", source)
 
+    def test_rest_responses_are_streamed_before_parsing(self):
+        source = _function_source("_make_rest_call")
+        self.assertIn("stream=True", source)
+        self.assertIn("r.iter_content", source)
+        self.assertIn("MAX_RESPONSE_BYTES", source)
+        self.assertLess(source.index("r.iter_content"), source.index("_process_response"))
+
 if __name__ == "__main__":
     unittest.main()

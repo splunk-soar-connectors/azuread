@@ -42,6 +42,7 @@ TC_FILE = "oauth_task.out"
 MSGRAPH_API_URL = "https://graph.microsoft.com/v1.0"
 AZUREADGRAPH_API_URL = "https://graph.windows.net"
 MAX_END_OFFSET_VAL = 2147483646
+MAX_RESPONSE_BYTES = 10 * 1024 * 1024
 PATH_IDENTIFIER_PARAMETERS = ("user_id", "object_id", "group_object_id")
 
 
@@ -571,7 +572,28 @@ class AzureADGraphConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
 
         try:
-            r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, params=params)
+            r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, params=params, stream=True)
+            content_length = r.headers.get("Content-Length")
+            if content_length and int(content_length) > MAX_RESPONSE_BYTES:
+                r.close()
+                return RetVal(
+                    action_result.set_status(phantom.APP_ERROR, f"Response exceeded the {MAX_RESPONSE_BYTES}-byte limit"),
+                    resp_json,
+                )
+
+            chunks = []
+            response_size = 0
+            for chunk in r.iter_content(chunk_size=64 * 1024):
+                response_size += len(chunk)
+                if response_size > MAX_RESPONSE_BYTES:
+                    r.close()
+                    return RetVal(
+                        action_result.set_status(phantom.APP_ERROR, f"Response exceeded the {MAX_RESPONSE_BYTES}-byte limit"),
+                        resp_json,
+                    )
+                chunks.append(chunk)
+            r._content = b"".join(chunks)
+            r._content_consumed = True
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {error_message}"), resp_json)
