@@ -48,11 +48,18 @@ class ValidationFollowupTests(unittest.TestCase):
 
     def test_pagination_has_an_action_wide_response_budget(self):
         source = _function_source("_handle_pagination")
-        self.assertIn("response_bytes += self._last_response_bytes", source)
-        self.assertIn("MAX_PAGINATION_RESPONSE_BYTES", source)
+        self.assertIn('response_budget = {"bytes": 0}', source)
+        self.assertIn("response_budget=response_budget", source)
         self.assertIn("MAX_PAGINATION_ITEM_BYTES", source)
         self.assertIn("MAX_SKIP_TOKEN_BYTES", source)
-        self.assertLess(source.index("MAX_PAGINATION_RESPONSE_BYTES"), source.index("action_result.add_data"))
+
+    def test_every_request_attempt_is_charged_before_response_processing(self):
+        rest_call = _function_source("_make_rest_call")
+        helper = _function_source("_make_rest_call_helper")
+        self.assertIn('response_budget["bytes"] += response_size', rest_call)
+        self.assertIn("MAX_PAGINATION_RESPONSE_BYTES", rest_call)
+        self.assertLess(rest_call.index('response_budget["bytes"] += response_size'), rest_call.index("_process_response"))
+        self.assertEqual(helper.count("response_budget,"), 2)
 
 
 if __name__ == "__main__":

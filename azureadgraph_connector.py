@@ -552,7 +552,18 @@ class AzureADGraphConnector(BaseConnector):
         url_to_app_rest = "{}/rest/handler/{}_{}/{}".format(phantom_base_url, app_dir_name, app_json["appid"], asset_name)
         return phantom.APP_SUCCESS, url_to_app_rest
 
-    def _make_rest_call(self, endpoint, action_result, verify=True, headers=None, params=None, data=None, json=None, method="get"):
+    def _make_rest_call(
+        self,
+        endpoint,
+        action_result,
+        verify=True,
+        headers=None,
+        params=None,
+        data=None,
+        json=None,
+        method="get",
+        response_budget=None,
+    ):
         """Function that makes the REST call to the app.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -604,9 +615,21 @@ class AzureADGraphConnector(BaseConnector):
                         resp_json,
                     )
                 chunks.append(chunk)
+
+            if response_budget is not None:
+                response_budget["bytes"] += response_size
+                if response_budget["bytes"] > MAX_PAGINATION_RESPONSE_BYTES:
+                    r.close()
+                    return RetVal(
+                        action_result.set_status(
+                            phantom.APP_ERROR,
+                            f"Pagination stopped before exceeding {MAX_PAGINATION_RESPONSE_BYTES} response bytes",
+                        ),
+                        resp_json,
+                    )
+
             r._content = b"".join(chunks)
             r._content_consumed = True
-            self._last_response_bytes = response_size
             if 300 <= r.status_code < 400:
                 return RetVal(action_result.set_status(phantom.APP_ERROR, "Unexpected redirect from server"), resp_json)
         except Exception as e:
@@ -615,7 +638,18 @@ class AzureADGraphConnector(BaseConnector):
 
         return self._process_response(r, action_result)
 
-    def _make_rest_call_helper(self, action_result, endpoint, verify=True, headers=None, params=None, data=None, json=None, method="get"):
+    def _make_rest_call_helper(
+        self,
+        action_result,
+        endpoint,
+        verify=True,
+        headers=None,
+        params=None,
+        data=None,
+        json=None,
+        method="get",
+        response_budget=None,
+    ):
         """Function that helps setting REST call to the app.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -643,7 +677,17 @@ class AzureADGraphConnector(BaseConnector):
 
         headers.update({"Authorization": f"Bearer {self._access_token}", "Accept": "application/json", "Content-Type": "application/json"})
 
-        ret_val, resp_json = self._make_rest_call(url, action_result, verify, headers, params, data, json, method)
+        ret_val, resp_json = self._make_rest_call(
+            url,
+            action_result,
+            verify,
+            headers,
+            params,
+            data,
+            json,
+            method,
+            response_budget,
+        )
 
         # If token is expired, generate a new token
         msg = action_result.get_message()
@@ -654,7 +698,17 @@ class AzureADGraphConnector(BaseConnector):
 
             headers.update({"Authorization": f"Bearer {self._access_token}"})
 
-            ret_val, resp_json = self._make_rest_call(url, action_result, verify, headers, params, data, json, method)
+            ret_val, resp_json = self._make_rest_call(
+                url,
+                action_result,
+                verify,
+                headers,
+                params,
+                data,
+                json,
+                method,
+                response_budget,
+            )
 
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
@@ -1254,7 +1308,7 @@ class AzureADGraphConnector(BaseConnector):
 
         page_count = 0
         item_count = 0
-        response_bytes = 0
+        response_budget = {"bytes": 0}
         seen_skip_tokens = set()
 
         while True:
@@ -1265,17 +1319,16 @@ class AzureADGraphConnector(BaseConnector):
                 )
 
             # make rest call
-            ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
+            ret_val, response = self._make_rest_call_helper(
+                action_result,
+                endpoint,
+                params=parameters,
+                method="get",
+                response_budget=response_budget,
+            )
 
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
-
-            response_bytes += self._last_response_bytes
-            if response_bytes > MAX_PAGINATION_RESPONSE_BYTES:
-                return action_result.set_status(
-                    phantom.APP_ERROR,
-                    f"Pagination stopped before exceeding {MAX_PAGINATION_RESPONSE_BYTES} response bytes",
-                )
 
             page_count += 1
             if "value" in response:
