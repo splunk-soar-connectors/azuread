@@ -43,7 +43,16 @@ class ValidationFollowupTests(unittest.TestCase):
         self.assertIn("stream=True", source)
         self.assertIn("r.iter_content", source)
         self.assertIn("MAX_RESPONSE_BYTES", source)
+        self.assertIn("allow_redirects=False", source)
         self.assertLess(source.index("r.iter_content"), source.index("_process_response"))
+
+    def test_pagination_has_an_action_wide_response_budget(self):
+        source = _function_source("_handle_pagination")
+        self.assertIn("response_bytes += self._last_response_bytes", source)
+        self.assertIn("MAX_PAGINATION_RESPONSE_BYTES", source)
+        self.assertIn("MAX_PAGINATION_ITEM_BYTES", source)
+        self.assertIn("MAX_SKIP_TOKEN_BYTES", source)
+        self.assertLess(source.index("MAX_PAGINATION_RESPONSE_BYTES"), source.index("action_result.add_data"))
 
 
 if __name__ == "__main__":

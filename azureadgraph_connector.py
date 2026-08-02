@@ -43,6 +43,9 @@ MSGRAPH_API_URL = "https://graph.microsoft.com/v1.0"
 AZUREADGRAPH_API_URL = "https://graph.windows.net"
 MAX_END_OFFSET_VAL = 2147483646
 MAX_RESPONSE_BYTES = 10 * 1024 * 1024
+MAX_PAGINATION_RESPONSE_BYTES = 10 * 1024 * 1024
+MAX_PAGINATION_ITEM_BYTES = 1024 * 1024
+MAX_SKIP_TOKEN_BYTES = 8192
 PATH_IDENTIFIER_PARAMETERS = ("user_id", "object_id", "group_object_id")
 
 
@@ -572,7 +575,16 @@ class AzureADGraphConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
 
         try:
-            r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, params=params, stream=True)
+            r = request_func(
+                endpoint,
+                json=json,
+                data=data,
+                headers=headers,
+                verify=verify,
+                params=params,
+                stream=True,
+                allow_redirects=False,
+            )
             content_length = r.headers.get("Content-Length")
             if content_length and int(content_length) > MAX_RESPONSE_BYTES:
                 r.close()
@@ -594,6 +606,9 @@ class AzureADGraphConnector(BaseConnector):
                 chunks.append(chunk)
             r._content = b"".join(chunks)
             r._content_consumed = True
+            self._last_response_bytes = response_size
+            if 300 <= r.status_code < 400:
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Unexpected redirect from server"), resp_json)
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {error_message}"), resp_json)
@@ -1239,6 +1254,7 @@ class AzureADGraphConnector(BaseConnector):
 
         page_count = 0
         item_count = 0
+        response_bytes = 0
         seen_skip_tokens = set()
 
         while True:
@@ -1254,6 +1270,13 @@ class AzureADGraphConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
 
+            response_bytes += self._last_response_bytes
+            if response_bytes > MAX_PAGINATION_RESPONSE_BYTES:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Pagination stopped before exceeding {MAX_PAGINATION_RESPONSE_BYTES} response bytes",
+                )
+
             page_count += 1
             if "value" in response:
                 page_items = response.get("value", [])
@@ -1263,6 +1286,11 @@ class AzureADGraphConnector(BaseConnector):
                         f"Pagination stopped before exceeding {MS_AZURE_MAX_PAGINATION_ITEMS} items",
                     )
                 for user in page_items:
+                    if len(json.dumps(user, separators=(",", ":")).encode("utf-8")) > MAX_PAGINATION_ITEM_BYTES:
+                        return action_result.set_status(
+                            phantom.APP_ERROR,
+                            f"Pagination item exceeded the {MAX_PAGINATION_ITEM_BYTES}-byte limit",
+                        )
                     action_result.add_data(user)
                 item_count += len(page_items)
             else:
@@ -1283,6 +1311,12 @@ class AzureADGraphConnector(BaseConnector):
                     return action_result.set_status(
                         phantom.APP_ERROR,
                         f"Unable to extract skiptoken from odata.nextLink: {e}",
+                    )
+
+                if len(skip_token.encode("utf-8")) > MAX_SKIP_TOKEN_BYTES:
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Pagination skip token exceeded the {MAX_SKIP_TOKEN_BYTES}-byte limit",
                     )
 
                 if skip_token in seen_skip_tokens:
