@@ -1,7 +1,7 @@
 # Azure AD Graph
 
 Publisher: Splunk <br>
-Connector Version: 2.5.4 <br>
+Connector Version: 2.5.5 <br>
 Product Vendor: Microsoft <br>
 Product Name: Azure AD Graph <br>
 Minimum Product Version: 8.6.0
