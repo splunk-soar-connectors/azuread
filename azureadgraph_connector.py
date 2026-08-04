@@ -42,6 +42,11 @@ TC_FILE = "oauth_task.out"
 MSGRAPH_API_URL = "https://graph.microsoft.com/v1.0"
 AZUREADGRAPH_API_URL = "https://graph.windows.net"
 MAX_END_OFFSET_VAL = 2147483646
+MAX_RESPONSE_BYTES = 10 * 1024 * 1024
+MAX_PAGINATION_RESPONSE_BYTES = 10 * 1024 * 1024
+MAX_PAGINATION_ITEM_BYTES = 1024 * 1024
+MAX_SKIP_TOKEN_BYTES = 8192
+PATH_IDENTIFIER_PARAMETERS = ("user_id", "object_id", "group_object_id")
 
 
 def _quote_path_segment(value):
@@ -89,6 +94,10 @@ def _handle_login_redirect(request, key):
     state = _load_app_state(asset_id)
     if not state:
         return HttpResponse("ERROR: Invalid asset_id", content_type="text/plain", status=400)
+    presented_nonce = request.GET.get("state_nonce", "")
+    stored_nonce = state.get(MS_AZURE_OAUTH_STATE_NONCE, "")
+    if not stored_nonce or not hmac.compare_digest(stored_nonce, presented_nonce):
+        return HttpResponse("ERROR: Invalid OAuth state", content_type="text/plain", status=400)
     url = state.get(key)
     if not url:
         return HttpResponse(f"App state is invalid, {key} not found.", content_type="text/plain", status=400)
@@ -543,7 +552,18 @@ class AzureADGraphConnector(BaseConnector):
         url_to_app_rest = "{}/rest/handler/{}_{}/{}".format(phantom_base_url, app_dir_name, app_json["appid"], asset_name)
         return phantom.APP_SUCCESS, url_to_app_rest
 
-    def _make_rest_call(self, endpoint, action_result, verify=True, headers=None, params=None, data=None, json=None, method="get"):
+    def _make_rest_call(
+        self,
+        endpoint,
+        action_result,
+        verify=True,
+        headers=None,
+        params=None,
+        data=None,
+        json=None,
+        method="get",
+        response_budget=None,
+    ):
         """Function that makes the REST call to the app.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -566,14 +586,70 @@ class AzureADGraphConnector(BaseConnector):
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Invalid method: {method}"), resp_json)
 
         try:
-            r = request_func(endpoint, json=json, data=data, headers=headers, verify=verify, params=params)
+            r = request_func(
+                endpoint,
+                json=json,
+                data=data,
+                headers=headers,
+                verify=verify,
+                params=params,
+                stream=True,
+                allow_redirects=False,
+            )
+            content_length = r.headers.get("Content-Length")
+            if content_length and int(content_length) > MAX_RESPONSE_BYTES:
+                r.close()
+                return RetVal(
+                    action_result.set_status(phantom.APP_ERROR, f"Response exceeded the {MAX_RESPONSE_BYTES}-byte limit"),
+                    resp_json,
+                )
+
+            chunks = []
+            response_size = 0
+            for chunk in r.iter_content(chunk_size=64 * 1024):
+                response_size += len(chunk)
+                if response_size > MAX_RESPONSE_BYTES:
+                    r.close()
+                    return RetVal(
+                        action_result.set_status(phantom.APP_ERROR, f"Response exceeded the {MAX_RESPONSE_BYTES}-byte limit"),
+                        resp_json,
+                    )
+                chunks.append(chunk)
+
+            if response_budget is not None:
+                response_budget["bytes"] += response_size
+                if response_budget["bytes"] > MAX_PAGINATION_RESPONSE_BYTES:
+                    r.close()
+                    return RetVal(
+                        action_result.set_status(
+                            phantom.APP_ERROR,
+                            f"Pagination stopped before exceeding {MAX_PAGINATION_RESPONSE_BYTES} response bytes",
+                        ),
+                        resp_json,
+                    )
+
+            r._content = b"".join(chunks)
+            r._content_consumed = True
+            if 300 <= r.status_code < 400:
+                return RetVal(action_result.set_status(phantom.APP_ERROR, "Unexpected redirect from server"), resp_json)
         except Exception as e:
             error_message = self._get_error_message_from_exception(e)
             return RetVal(action_result.set_status(phantom.APP_ERROR, f"Error Connecting to server. Details: {error_message}"), resp_json)
 
         return self._process_response(r, action_result)
 
-    def _make_rest_call_helper(self, action_result, endpoint, verify=True, headers=None, params=None, data=None, json=None, method="get"):
+    def _make_rest_call_helper(
+        self,
+        action_result,
+        endpoint,
+        verify=True,
+        headers=None,
+        params=None,
+        data=None,
+        json=None,
+        method="get",
+        response_budget=None,
+    ):
         """Function that helps setting REST call to the app.
 
         :param endpoint: REST endpoint that needs to appended to the service address
@@ -601,7 +677,17 @@ class AzureADGraphConnector(BaseConnector):
 
         headers.update({"Authorization": f"Bearer {self._access_token}", "Accept": "application/json", "Content-Type": "application/json"})
 
-        ret_val, resp_json = self._make_rest_call(url, action_result, verify, headers, params, data, json, method)
+        ret_val, resp_json = self._make_rest_call(
+            url,
+            action_result,
+            verify,
+            headers,
+            params,
+            data,
+            json,
+            method,
+            response_budget,
+        )
 
         # If token is expired, generate a new token
         msg = action_result.get_message()
@@ -612,7 +698,17 @@ class AzureADGraphConnector(BaseConnector):
 
             headers.update({"Authorization": f"Bearer {self._access_token}"})
 
-            ret_val, resp_json = self._make_rest_call(url, action_result, verify, headers, params, data, json, method)
+            ret_val, resp_json = self._make_rest_call(
+                url,
+                action_result,
+                verify,
+                headers,
+                params,
+                data,
+                json,
+                method,
+                response_budget,
+            )
 
         if phantom.is_fail(ret_val):
             return action_result.get_status(), None
@@ -680,7 +776,8 @@ class AzureADGraphConnector(BaseConnector):
 
         # The URL that the user should open in a different tab.
         # This is pointing to a REST endpoint that points to the app
-        url_to_show = f"{app_rest_url}/start_oauth?asset_id={self.get_asset_id()}&"
+        start_query = urlparse.urlencode({"asset_id": self.get_asset_id(), "state_nonce": oauth_state_nonce})
+        url_to_show = f"{app_rest_url}/start_oauth?{start_query}"
 
         # Save the state, will be used by the request handler
         _save_app_state(app_state, self.get_asset_id(), self)
@@ -1211,6 +1308,7 @@ class AzureADGraphConnector(BaseConnector):
 
         page_count = 0
         item_count = 0
+        response_budget = {"bytes": 0}
         seen_skip_tokens = set()
 
         while True:
@@ -1221,7 +1319,13 @@ class AzureADGraphConnector(BaseConnector):
                 )
 
             # make rest call
-            ret_val, response = self._make_rest_call_helper(action_result, endpoint, params=parameters, method="get")
+            ret_val, response = self._make_rest_call_helper(
+                action_result,
+                endpoint,
+                params=parameters,
+                method="get",
+                response_budget=response_budget,
+            )
 
             if phantom.is_fail(ret_val):
                 return action_result.get_status()
@@ -1235,6 +1339,11 @@ class AzureADGraphConnector(BaseConnector):
                         f"Pagination stopped before exceeding {MS_AZURE_MAX_PAGINATION_ITEMS} items",
                     )
                 for user in page_items:
+                    if len(json.dumps(user, separators=(",", ":")).encode("utf-8")) > MAX_PAGINATION_ITEM_BYTES:
+                        return action_result.set_status(
+                            phantom.APP_ERROR,
+                            f"Pagination item exceeded the {MAX_PAGINATION_ITEM_BYTES}-byte limit",
+                        )
                     action_result.add_data(user)
                 item_count += len(page_items)
             else:
@@ -1257,6 +1366,12 @@ class AzureADGraphConnector(BaseConnector):
                         f"Unable to extract skiptoken from odata.nextLink: {e}",
                     )
 
+                if len(skip_token.encode("utf-8")) > MAX_SKIP_TOKEN_BYTES:
+                    return action_result.set_status(
+                        phantom.APP_ERROR,
+                        f"Pagination skip token exceeded the {MAX_SKIP_TOKEN_BYTES}-byte limit",
+                    )
+
                 if skip_token in seen_skip_tokens:
                     return action_result.set_status(phantom.APP_ERROR, "Pagination stopped because the server repeated a skiptoken")
                 seen_skip_tokens.add(skip_token)
@@ -1273,6 +1388,23 @@ class AzureADGraphConnector(BaseConnector):
         action_id = self.get_action_identifier()
 
         self.debug_print("action_id", self.get_action_identifier())
+
+        for parameter_name in PATH_IDENTIFIER_PARAMETERS:
+            if parameter_name in param and str(param[parameter_name]).strip() in {".", ".."}:
+                safe_param = dict(param)
+                safe_param.pop("temp_password", None)
+                action_result = self.add_action_result(ActionResult(safe_param))
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    f"Invalid {parameter_name}: dot-segment identifiers are not allowed",
+                )
+
+        if action_id == "remove_user" and not str(param.get("group_object_id", "")).strip():
+            action_result = self.add_action_result(ActionResult(dict(param)))
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                "Invalid group_object_id: an identifier is required to remove a user",
+            )
 
         if action_id == "test_connectivity":
             ret_val = self._handle_test_connectivity(param)
